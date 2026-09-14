@@ -17,9 +17,19 @@ from typing import Dict, List
 
 from movement_engine.domain.models import Agent, Post, Wish, Assignment
 from movement_engine.solver.engine import run_engine
+from movement_engine.solver.deferred_acceptance import run_deferred_acceptance
 from movement_engine.explain.certificate import (
     build_certificate, verify_certificate, tamper_and_check,
 )
+
+
+def _resolve_engine(name: str):
+    """Return the solver callable for a CLI engine name."""
+    if name in ("da", "deferred", "deferred_acceptance"):
+        return run_deferred_acceptance
+    if name in ("legacy", "greedy", "engine"):
+        return run_engine
+    raise SystemExit(f"unknown engine: {name!r} (use 'da' or 'legacy')")
 
 
 def make_dataset(n_agents: int, n_posts: int, seed: int = 20260810):
@@ -56,38 +66,18 @@ def make_dataset(n_agents: int, n_posts: int, seed: int = 20260810):
 
 
 def cmd_test(_args):
-    import movement_engine.tests.test_scorer as ts
-    import movement_engine.tests.test_engine as te
-
-    tests = [
-        ts.test_echelon_table, ts.test_medical_bonus_only_wish_one,
-        ts.test_medical_bonus_not_on_wish_two, ts.test_children,
-        ts.test_unique_parental_authority, ts.test_renewal_is_capped_at_90,
-        ts.test_rc_apc_cannot_be_combined, ts.test_rc_does_not_apply_to_group_wish,
-        ts.test_priority_beats_huge_bareme, ts.test_deterministic,
-        te.test_simple_vacant_assignment, te.test_holder_stays_post_not_taken,
-        te.test_holder_stays_blocks, te.test_priority_beats_bareme,
-        te.test_cycle_detected_not_auto_resolved, te.test_no_double_assignment,
-        te.test_deterministic_hash, te.test_chain_liberation, te.test_rc_group_rejected,
-    ]
-    failed = 0
-    for t in tests:
-        try:
-            t()
-            print(f"  PASS  {t.__name__}")
-        except Exception as e:
-            print(f"  FAIL  {t.__name__}: {e}")
-            failed += 1
-    print(f"\n{len(tests) - failed}/{len(tests)} passed")
-    return 0 if failed == 0 else 1
+    # Delegate to the dependency-free discovery runner (covers all test modules).
+    from movement_engine.run_tests import main as run_all
+    return run_all()
 
 
 def cmd_run(args):
     n = args.agents
     n_posts = int(n * 1.5)
     agents, posts, wishes = make_dataset(n, n_posts, seed=args.seed)
+    solver = _resolve_engine(getattr(args, "engine", "da"))
     t0 = time.perf_counter()
-    result = run_engine(agents, posts, wishes, campaign_seed=str(args.seed))
+    result = solver(agents, posts, wishes, campaign_seed=str(args.seed))
     total_ms = (time.perf_counter() - t0) * 1000
 
     cert = build_certificate(
@@ -97,6 +87,11 @@ def cmd_run(args):
         run_id=f"run-{n}",
     )
     v = verify_certificate(cert, result.assignments, agents, posts)
+
+    # Independent fairness proof (no justified envy). Only meaningful for stable solvers.
+    from movement_engine.explain.stability import check_stability
+    stab = check_stability(result.assignments, agents, posts, wishes,
+                           campaign_seed=str(args.seed))
 
     n_wishes = sum(len(w) for w in wishes.values())
     print()
@@ -122,10 +117,20 @@ def cmd_run(args):
     print(f"Result hash             {cert.result_hash}")
     print(f"Ruleset                 {cert.ruleset}")
     print(f"Engine                  {cert.engine_version}")
+    print(f"Solveur                 {result.metrics.get('method', 'LEGACY')}")
     print(f"Verification            {v['valid'] and 'PASS' or 'FAIL'}")
     if not v["valid"]:
         for r in v["reasons"]:
             print(f"  ! {r}")
+    print()
+    print("ÉQUITÉ (preuve indépendante)")
+    print(f"Sans envie justifiée    {'OUI' if stab.stable_modulo_policy else 'NON'}")
+    print(f"Paires vérifiées        {stab.n_checked_pairs:,}")
+    if stab.witnesses:
+        print(f"Violations réelles      {len(stab.witnesses)} (échantillon)")
+    if stab.pure_exchange_opportunities:
+        print(f"Échanges possibles      {len(stab.pure_exchange_opportunities)} "
+              f"(bloqués par la politique anti-permutation)")
     print()
     return 0 if v["valid"] else 1
 
@@ -134,6 +139,8 @@ def cmd_benchmark(args):
     sizes = [100, 1000, 5000, 10000]
     if args.large:
         sizes += [25000, 50000]
+    solver = _resolve_engine(getattr(args, "engine", "da"))
+    print(f"engine = {getattr(args, 'engine', 'da')}")
     print(f"{'N':>8} {'Posts':>8} {'Med ms':>10} {'Assigned':>10} {'Hash':>18}")
     print("-" * 60)
     for n in sizes:
@@ -141,14 +148,39 @@ def cmd_benchmark(args):
         times = []
         last = None
         reps = 3 if n >= 10000 else 5
-        run_engine(agents, posts, wishes)  # warmup
+        solver(agents, posts, wishes)  # warmup
         for _ in range(reps):
-            r = run_engine(agents, posts, wishes)
+            r = solver(agents, posts, wishes)
             times.append(r.elapsed_ms)
             last = r
         times.sort()
         med = times[len(times) // 2]
         print(f"{n:>8} {int(n*1.5):>8} {med:>10.1f} {last.metrics['assigned']:>10} {last.result_hash:>18}")
+    return 0
+
+
+def cmd_compare(args):
+    """Compare the legacy greedy engine and the deferred-acceptance solver."""
+    from movement_engine.optimizer.objective import quality_report
+    sizes = [1000, 5000, 10000]
+    if args.large:
+        sizes += [25000, 50000]
+    print("LEGACY (greedy serial dictatorship)  vs  DA (deferred acceptance, stable)")
+    hdr = (f"{'N':>7} | {'legacy ms':>9} {'asg':>6} {'vœu1':>6} {'avg':>6}"
+           f" | {'DA ms':>7} {'asg':>6} {'vœu1':>6} {'avg':>6}"
+           f" | {'+asg':>5} {'+vœu1':>6}")
+    print(hdr)
+    print("-" * len(hdr))
+    for n in sizes:
+        agents, posts, wishes = make_dataset(n, int(n * 1.5), seed=args.seed)
+        run_engine(agents, posts, wishes); run_deferred_acceptance(agents, posts, wishes)
+        t = time.perf_counter(); r0 = run_engine(agents, posts, wishes); e0 = (time.perf_counter() - t) * 1000
+        t = time.perf_counter(); r1 = run_deferred_acceptance(agents, posts, wishes); e1 = (time.perf_counter() - t) * 1000
+        q0 = quality_report(r0.assignments, agents); q1 = quality_report(r1.assignments, agents)
+        print(f"{n:>7} | {e0:>9.1f} {q0['assigned']:>6} {q0['first_wish']:>6} {q0['avg_wish_rank']:>6}"
+              f" | {e1:>7.1f} {q1['assigned']:>6} {q1['first_wish']:>6} {q1['avg_wish_rank']:>6}"
+              f" | {q1['assigned']-q0['assigned']:>+5} {q1['first_wish']-q0['first_wish']:>+6}")
+    print("\nDA is a stable matching (no justified envy) and teacher-optimal.")
     return 0
 
 
@@ -223,9 +255,15 @@ def main():
     p_run = sub.add_parser("run")
     p_run.add_argument("--agents", type=int, default=10000)
     p_run.add_argument("--seed", type=int, default=20260810)
+    p_run.add_argument("--engine", type=str, default="da", help="da (default) | legacy")
 
     p_bench = sub.add_parser("benchmark")
     p_bench.add_argument("--large", action="store_true")
+    p_bench.add_argument("--engine", type=str, default="da", help="da (default) | legacy")
+
+    p_cmp = sub.add_parser("compare")
+    p_cmp.add_argument("--large", action="store_true")
+    p_cmp.add_argument("--seed", type=int, default=20260810)
 
     sub.add_parser("verify")
 
@@ -241,6 +279,8 @@ def main():
         sys.exit(cmd_run(args))
     elif args.cmd == "benchmark":
         sys.exit(cmd_benchmark(args))
+    elif args.cmd == "compare":
+        sys.exit(cmd_compare(args))
     elif args.cmd == "verify":
         sys.exit(cmd_verify(args))
     elif args.cmd == "whatif":

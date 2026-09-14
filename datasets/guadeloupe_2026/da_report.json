@@ -1,0 +1,46 @@
+{
+  "dataset": "guadeloupe-2026 (postes réels, vœux synthétiques)",
+  "n_agents": 1200,
+  "n_posts": 2654,
+  "max_wishes": 20,
+  "seed": 20260811,
+  "notes": [
+    "Postes RÉELS extraits des PDF officiels du mouvement Guadeloupe 2026.",
+    "Vœux SYNTHÉTIQUES — pas de vraies préférences enseignantes dans les sources.",
+    "Stabilité vérifiée par un module indépendant du solveur."
+  ],
+  "results": [
+    {
+      "solver": "LEGACY_GREEDY",
+      "elapsed_ms": 97.2,
+      "assigned": 1093,
+      "stayed": 107,
+      "unassigned": 0,
+      "first_wish": 149,
+      "first_wish_pct": 13.63,
+      "top3_rate": 37.24,
+      "avg_wish_rank": 5.782,
+      "stable_no_justified_envy": false,
+      "stability_pairs_checked": 6181,
+      "true_justified_envy": 50,
+      "pure_exchange_opportunities": 50,
+      "cycles_detected": 6
+    },
+    {
+      "solver": "DEFERRED_ACCEPTANCE",
+      "elapsed_ms": 77.0,
+      "assigned": 1200,
+      "stayed": 0,
+      "unassigned": 0,
+      "first_wish": 921,
+      "first_wish_pct": 76.75,
+      "top3_rate": 97.5,
+      "avg_wish_rank": 1.351,
+      "stable_no_justified_envy": true,
+      "stability_pairs_checked": 403,
+      "true_justified_envy": 0,
+      "pure_exchange_opportunities": 9,
+      "cycles_detected": 9
+    }
+  ]
+}
