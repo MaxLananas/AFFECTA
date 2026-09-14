@@ -1,0 +1,50 @@
+{
+  "id": "greedy_counterexample_chain",
+  "description": "Naive sequential without liberation assigns fewer than optimal with chain",
+  "naive_assigned": 1,
+  "optimal_assigned": 2,
+  "agents": [
+    {
+      "id": "A",
+      "echelon": 5
+    },
+    {
+      "id": "B",
+      "echelon": 5,
+      "current_post_id": "XB"
+    }
+  ],
+  "posts": [
+    {
+      "id": "XB",
+      "commune": "BT",
+      "support": "ECEL",
+      "vacant": false,
+      "holder_id": "B"
+    },
+    {
+      "id": "Y",
+      "commune": "BT",
+      "support": "ECEL",
+      "vacant": true
+    }
+  ],
+  "wishes": {
+    "A": [
+      {
+        "rank": 1,
+        "post_ids": [
+          "XB"
+        ]
+      }
+    ],
+    "B": [
+      {
+        "rank": 1,
+        "post_ids": [
+          "Y"
+        ]
+      }
+    ]
+  }
+}

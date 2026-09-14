@@ -1,0 +1,48 @@
+{
+  "dataset_id": "guadeloupe-2026-alpha",
+  "version": "2026.08.11-alpha1",
+  "created_at": "2026-08-11T18:22:01.102179+00:00",
+  "sources": {
+    "VOEUX_PRECIS": {
+      "path": "/home/workdir/attachments/VOEUX PRECIS_2.pdf",
+      "filename": "VOEUX PRECIS_2.pdf",
+      "sha256": "dc8163839d3ee21d2e3a8ce9abb84d49bfaa65d619b8c1b1e2520092ba44448f",
+      "size_bytes": 1534592
+    },
+    "ASSIMILES_COMMUNES": {
+      "path": "/home/workdir/attachments/VOEUX GROUPE ASSIMILES COMMUNES_0.pdf",
+      "filename": "VOEUX GROUPE ASSIMILES COMMUNES_0.pdf",
+      "sha256": "9dcf9a997b9b57d5868c5a2cd599a9d64e1f0d5e7eddacddcbb995cff3077bcc",
+      "size_bytes": 354487
+    },
+    "AUTRE_MOB": {
+      "path": "/home/workdir/attachments/VOEUX GROUPE AUTRE MOB_2.pdf",
+      "filename": "VOEUX GROUPE AUTRE MOB_2.pdf",
+      "sha256": "b41e27879d0e4fc34847c139e3f8e9918a465983143771d5b20428156e49f729",
+      "size_bytes": 175913
+    },
+    "AUTRE_ZONE": {
+      "path": "/home/workdir/attachments/VOEUX GROUPE AUTRE ZONE.pdf",
+      "filename": "VOEUX GROUPE AUTRE ZONE.pdf",
+      "sha256": "ea961866487c3effadec51c1b3ecf26a5573fc99223f4e2ce76bbaf2253b66db",
+      "size_bytes": 278639
+    }
+  },
+  "files": {
+    "posts.json": {
+      "sha256": "6270bb980deadee43a356c7d91cc3eb8e5ced526552905d8dabb32d861bdb7fe",
+      "count": 1310
+    },
+    "groups.json": {
+      "sha256": "b97d0823bdef4d3cc7841c925898f243d92d6c76ea7d04fdc300a4b8d5914ca9",
+      "count": 435
+    }
+  },
+  "scope": "INTRA_DEPARTEMENTAL_1D_GUADELOUPE_2026",
+  "notes": [
+    "Data extracted from official movement PDFs",
+    "No regulatory scoring rules derived from these files",
+    "Group internal selection rules marked UNKNOWN",
+    "Agent wishes not present — must be synthetic for Alpha"
+  ]
+}

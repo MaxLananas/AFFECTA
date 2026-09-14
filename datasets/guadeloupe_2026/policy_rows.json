@@ -1,0 +1,53 @@
+[
+  {
+    "policy": "TEACHER_FIRST",
+    "assigned": 1200,
+    "unassigned": 0,
+    "voeu1": 775,
+    "top3": 1146,
+    "avg_rank": 1.555,
+    "median_rank": 1,
+    "sat": 98.89,
+    "remaining_vacant": 1454,
+    "sous_effectif": 345,
+    "critiques": 178,
+    "vides": 35,
+    "pire_deficit": 18,
+    "ms": 524.3,
+    "hash": "ed279fc84f501981"
+  },
+  {
+    "policy": "BALANCED",
+    "assigned": 1200,
+    "unassigned": 0,
+    "voeu1": 696,
+    "top3": 1163,
+    "avg_rank": 1.585,
+    "median_rank": 1,
+    "sat": 98.83,
+    "remaining_vacant": 1454,
+    "sous_effectif": 348,
+    "critiques": 172,
+    "vides": 38,
+    "pire_deficit": 19,
+    "ms": 456.6,
+    "hash": "4a92dd0b62a15ebd"
+  },
+  {
+    "policy": "COVERAGE_FIRST",
+    "assigned": 1200,
+    "unassigned": 0,
+    "voeu1": 552,
+    "top3": 1048,
+    "avg_rank": 2.001,
+    "median_rank": 2,
+    "sat": 98.0,
+    "remaining_vacant": 1454,
+    "sous_effectif": 346,
+    "critiques": 177,
+    "vides": 45,
+    "pire_deficit": 19,
+    "ms": 456.0,
+    "hash": "6bc16e413da80adc"
+  }
+]

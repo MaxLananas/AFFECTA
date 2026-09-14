@@ -1,0 +1,228 @@
+{
+  "dataset": "guadeloupe-2026-alpha",
+  "seed": 20260811,
+  "n_agents": 1200,
+  "notes": [
+    "Wishes are SYNTHETIC — not real teacher preferences",
+    "Policies are PRODUCT_POLICY — not official movement rules",
+    "OPTIMALITY remains UNKNOWN",
+    "Understaffing thresholds are DESIGN_DECISION"
+  ],
+  "wish_effect": [
+    {
+      "agents": 1200,
+      "max_wishes": 5,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1007,
+      "voeu1": 599,
+      "top3": 955,
+      "avg_rank": 1.623,
+      "sat": 98.75,
+      "ms": 82.9,
+      "fill_pct": 45.21,
+      "sous_effectif": 342,
+      "critiques": 182,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 10,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1192,
+      "voeu1": 714,
+      "top3": 1113,
+      "avg_rank": 1.687,
+      "sat": 98.63,
+      "ms": 145.5,
+      "fill_pct": 45.21,
+      "sous_effectif": 346,
+      "critiques": 182,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1200,
+      "voeu1": 773,
+      "top3": 1144,
+      "avg_rank": 1.566,
+      "sat": 98.87,
+      "ms": 304.3,
+      "fill_pct": 45.21,
+      "sous_effectif": 347,
+      "critiques": 178,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 30,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1200,
+      "voeu1": 803,
+      "top3": 1159,
+      "avg_rank": 1.492,
+      "sat": 99.02,
+      "ms": 418.4,
+      "fill_pct": 45.21,
+      "sous_effectif": 348,
+      "critiques": 181,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 50,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1200,
+      "voeu1": 828,
+      "top3": 1160,
+      "avg_rank": 1.462,
+      "sat": 99.08,
+      "ms": 579.2,
+      "fill_pct": 45.21,
+      "sous_effectif": 343,
+      "critiques": 175,
+      "opt": "UNKNOWN"
+    }
+  ],
+  "solver_comparison": [
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "NAIVE",
+      "assigned": 245,
+      "voeu1": 32,
+      "top3": 81,
+      "avg_rank": 6.237,
+      "sat": 89.53,
+      "ms": 20.2,
+      "fill_pct": 45.21,
+      "sous_effectif": 339,
+      "critiques": 177,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "LIBERATION",
+      "assigned": 1073,
+      "voeu1": 154,
+      "top3": 414,
+      "avg_rank": 5.6,
+      "sat": 90.8,
+      "ms": 340.1,
+      "fill_pct": 45.21,
+      "sous_effectif": 346,
+      "critiques": 171,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "AFFECTA_HYBRID",
+      "assigned": 1200,
+      "voeu1": 773,
+      "top3": 1144,
+      "avg_rank": 1.566,
+      "sat": 98.87,
+      "ms": 532.9,
+      "fill_pct": 45.21,
+      "sous_effectif": 347,
+      "critiques": 178,
+      "opt": "UNKNOWN"
+    }
+  ],
+  "policy_comparison": [
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "TEACHER_FIRST",
+      "assigned": 1200,
+      "voeu1": 794,
+      "top3": 1141,
+      "avg_rank": 1.542,
+      "sat": 98.92,
+      "ms": 255.4,
+      "fill_pct": 45.21,
+      "sous_effectif": 347,
+      "critiques": 171,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "BALANCED",
+      "assigned": 1200,
+      "voeu1": 794,
+      "top3": 1141,
+      "avg_rank": 1.542,
+      "sat": 98.92,
+      "ms": 300.9,
+      "fill_pct": 45.21,
+      "sous_effectif": 347,
+      "critiques": 171,
+      "opt": "UNKNOWN"
+    },
+    {
+      "agents": 1200,
+      "max_wishes": 20,
+      "solver": "COVERAGE_FIRST",
+      "assigned": 1200,
+      "voeu1": 794,
+      "top3": 1141,
+      "avg_rank": 1.542,
+      "sat": 98.92,
+      "ms": 463.4,
+      "fill_pct": 45.21,
+      "sous_effectif": 347,
+      "critiques": 171,
+      "opt": "UNKNOWN"
+    }
+  ],
+  "establishment_teacher": {
+    "posts_modeled": 1310,
+    "capacity_total": 2654,
+    "filled": 1200,
+    "remaining_vacant_units": 1454,
+    "fill_rate_pct": 45.21,
+    "etablissements": 368,
+    "etablissements_sous_effectif": 347,
+    "etablissements_critiques": 171,
+    "communes_touchees": 32,
+    "top_natures_deficit": [
+      [
+        "DE",
+        213
+      ],
+      [
+        "DCOM",
+        19
+      ],
+      [
+        "ISES",
+        18
+      ],
+      [
+        "ULCG",
+        15
+      ],
+      [
+        "ECMA",
+        15
+      ],
+      [
+        "ULLP",
+        11
+      ],
+      [
+        "TD",
+        8
+      ],
+      [
+        "ASOU",
+        7
+      ]
+    ],
+    "threshold_note": "PRODUCT_POLICY: sous-effectif = remaining>=1; critique = fill/cap < 0.5 if cap>=2"
+  }
+}

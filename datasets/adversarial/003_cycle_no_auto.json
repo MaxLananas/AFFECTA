@@ -1,0 +1,22 @@
+{
+  "id": "003_cycle_no_auto",
+  "description": "Cycle A↔B must be detected and NOT auto-resolved",
+  "agents": [
+    {"id": "A", "echelon": 5, "current_post_id": "XA"},
+    {"id": "B", "echelon": 5, "current_post_id": "XB"}
+  ],
+  "posts": [
+    {"id": "XA", "commune": "BT", "support": "ECEL", "vacant": false, "holder_id": "A"},
+    {"id": "XB", "commune": "BT", "support": "ECEL", "vacant": false, "holder_id": "B"}
+  ],
+  "wishes": {
+    "A": [{"rank": 1, "post_ids": ["XB"], "precise": true}],
+    "B": [{"rank": 1, "post_ids": ["XA"], "precise": true}]
+  },
+  "expected": {
+    "A": {"kind": "STAY"},
+    "B": {"kind": "STAY"},
+    "cycles_detected_min": 1
+  },
+  "assertions": ["unknown_cycle_no_mutation"]
+}

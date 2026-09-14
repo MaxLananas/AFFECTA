@@ -1,0 +1,209 @@
+========================================================
+DOSSIER D'AFFECTATION — A00003
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : CAPESTERRE BELLE EAU / DE
+Rang de vœu       : n°2
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    CAPESTERRE BELLE EAU / TD                  → non obtenu (voir motif)
+  Vœu n°2    CAPESTERRE BELLE EAU / DE                  → OBTENU
+  Vœu n°3    CAPESTERRE BELLE EAU / ECEL                → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°4    CAPESTERRE BELLE EAU / DE                  → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    CAPESTERRE BELLE EAU / ECEL                → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    CAPESTERRE BELLE EAU / ECMA                → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    CAPESTERRE BELLE EAU / DE                  → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    CAPESTERRE BELLE EAU / ECEL                → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste n'a pas été libéré par son titulaire.
+
+========================================================
+DOSSIER D'AFFECTATION — A00009
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : POINTE A PITRE / UEE
+Rang de vœu       : n°2
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    POINTE A PITRE / ECEL                      → non obtenu (voir motif)
+  Vœu n°2    POINTE A PITRE / UEE                       → OBTENU
+  Vœu n°3    POINTE A PITRE / ECEL                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°4    POINTE A PITRE / ECMA                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    POINTE A PITRE / ECEL                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    POINTE A PITRE / ECMA                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    POINTE A PITRE / ECEL                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    POINTE A PITRE / DE                        → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Motif : VOUS_AVIEZ_MEILLEUR_SCORE_ANOMALIE
+
+========================================================
+DOSSIER D'AFFECTATION — A00012
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : LE GOSIER / ECMA
+Rang de vœu       : n°2
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    LE GOSIER / DE                             → non obtenu (voir motif)
+  Vœu n°2    LE GOSIER / ECMA                           → OBTENU
+  Vœu n°3    LE GOSIER / RASE                           → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°4    LE GOSIER / DE                             → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    LE GOSIER / ULLP                           → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    LE GOSIER / ECEL                           → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    LE GOSIER / ECEL                           → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    LE GOSIER / ECEL                           → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste demandé a été attribué à un autre candidat.
+  Concurrent          : A01075
+  Votre priorité      : 99
+  Priorité concurrent : 99
+  Votre barème        : 98 pts
+  Barème concurrent   : 109 pts
+
+========================================================
+DOSSIER D'AFFECTATION — A00017
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : LES ABYMES / DE
+Rang de vœu       : n°3
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    LES ABYMES / ECMA                          → non obtenu (voir motif)
+  Vœu n°2    LES ABYMES / ECMA                          → non obtenu (voir motif)
+  Vœu n°3    LES ABYMES / DE                            → OBTENU
+  Vœu n°4    LES ABYMES / TD                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    LES ABYMES / ECEL                          → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    LES ABYMES / ECMA                          → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    LES ABYMES / ASOU                          → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    LES ABYMES / ECEL                          → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Motif : VOUS_AVIEZ_MEILLEUR_SCORE_ANOMALIE
+
+========================================================
+DOSSIER D'AFFECTATION — A00023
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      :  / ECMA
+Rang de vœu       : n°2
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1     / ECEL                                    → non obtenu (voir motif)
+  Vœu n°2     / ECMA                                    → OBTENU
+  Vœu n°3     / ULEC                                    → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°4     / ECEL                                    → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5     / DE                                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6     / ECEL                                    → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7     / TR                                      → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8     / ECMA                                    → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste n'a pas été libéré par son titulaire.
+
+========================================================
+DOSSIER D'AFFECTATION — A00024
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : ANSE BERTRAND / DE
+Rang de vœu       : n°3
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    TERRE DE BAS / DE                          → non obtenu (voir motif)
+  Vœu n°2    TERRE DE BAS / ECEL                        → non obtenu (voir motif)
+  Vœu n°3    ANSE BERTRAND / DE                         → OBTENU
+  Vœu n°4    ANSE BERTRAND / ECEL                       → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    ANSE BERTRAND / ECEL                       → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    ANSE BERTRAND / ECEL                       → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    ANSE BERTRAND / UEE                        → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    ANSE BERTRAND / TR                         → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste n'a pas été libéré par son titulaire.
+
+========================================================
+DOSSIER D'AFFECTATION — A00027
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : STE ANNE / ECEL
+Rang de vœu       : n°2
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    STE ANNE / DE                              → non obtenu (voir motif)
+  Vœu n°2    STE ANNE / ECEL                            → OBTENU
+  Vœu n°3    STE ANNE / ECMA                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°4    STE ANNE / ECEL                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    STE ANNE / TR                              → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    STE ANNE / ECEL                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    STE ANNE / ECEL                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    STE ANNE / TR                              → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste demandé a été attribué à un autre candidat.
+  Concurrent          : A00679
+  Votre priorité      : 99
+  Priorité concurrent : 99
+  Votre barème        : 85 pts
+  Barème concurrent   : 149 pts
+
+========================================================
+DOSSIER D'AFFECTATION — A00033
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : BAIE MAHAULT / ECMA
+Rang de vœu       : n°4
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    BAIE MAHAULT / ECMA                        → non obtenu (voir motif)
+  Vœu n°2    BAIE MAHAULT / ECMA                        → non obtenu (voir motif)
+  Vœu n°3    BAIE MAHAULT / ECEL                        → non obtenu (voir motif)
+  Vœu n°4    BAIE MAHAULT / ECMA                        → OBTENU
+  Vœu n°5    BAIE MAHAULT / UEE                         → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    BAIE MAHAULT / UEE                         → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    BAIE MAHAULT / ULEC                        → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    BAIE MAHAULT / ECEL                        → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste n'a pas été libéré par son titulaire.
+
+========================================================
+DOSSIER D'AFFECTATION — A00045
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : STE ANNE / ECEL
+Rang de vœu       : n°5
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    STE ANNE / ECMA                            → non obtenu (voir motif)
+  Vœu n°2    STE ANNE / TD                              → non obtenu (voir motif)
+  Vœu n°3    STE ANNE / ECMA                            → non obtenu (voir motif)
+  Vœu n°4    STE ANNE / ECMA                            → non obtenu (voir motif)
+  Vœu n°5    STE ANNE / ECEL                            → OBTENU
+  Vœu n°6    STE ANNE / ECEL                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    STE ANNE / ECEL                            → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    STE ANNE / TD                              → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Le poste n'a pas été libéré par son titulaire.
+
+========================================================
+DOSSIER D'AFFECTATION — A00053
+========================================================
+Résultat          : affecté(e)
+Poste obtenu      : ST FRANCOIS / ECEL
+Rang de vœu       : n°3
+
+Vos vœux et ce qu'il en est devenu :
+  Vœu n°1    ST FRANCOIS / ECEL                         → non obtenu (voir motif)
+  Vœu n°2    ST FRANCOIS / ECMA                         → non obtenu (voir motif)
+  Vœu n°3    ST FRANCOIS / ECEL                         → OBTENU
+  Vœu n°4    ST FRANCOIS / TS                           → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°5    ST FRANCOIS / ECMA                         → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°6    ST FRANCOIS / ECEL                         → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°7    ST FRANCOIS / ECEL                         → non examiné (vœu mieux classé déjà obtenu)
+  Vœu n°8    ST FRANCOIS / ECEL                         → non examiné (vœu mieux classé déjà obtenu)
+
+Pourquoi pas votre vœu n°1 ?
+  Motif : VOUS_AVIEZ_MEILLEUR_SCORE_ANOMALIE

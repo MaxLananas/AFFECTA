@@ -1,0 +1,48 @@
+##### D1_voeu1
+MON AFFECTATION
+  Agent              A00005
+  Affecte a          203486#0
+  Rang obtenu        1
+  Statut             ASSIGNED
+
+Pourquoi pas le voeu n°1 ?
+
+  Poste 203486#0
+    Motif     : YOU_GOT_THIS_POST
+
+
+##### D2_reglementaire
+MON AFFECTATION
+  Agent              A00014
+  Affecte a          162882#3
+  Rang obtenu        3
+  Statut             ASSIGNED
+
+Pourquoi pas le voeu n°1 ?
+
+  Poste 162901
+    Motif     : un autre candidat a ete mieux classe
+    Categorie : REGLEMENTAIRE
+    Concurrent: A00404
+    Votre priorite / bareme     : 99 / 146
+    Concurrent priorite / bareme: 99 / 183
+
+
+##### D3_optimisation
+MON AFFECTATION
+  Agent              A00003
+  Affecte a          203490
+  Rang obtenu        8
+  Statut             ASSIGNED
+
+Pourquoi pas le voeu n°1 ?
+
+  Poste 162688#0
+    Motif     : DECISION_OPTIMISATION (preuve partielle)
+    Categorie : OPTIMISATION
+    Detail    : Dans l'etat final, un autre agent occupe ce poste. D'apres le scorer
+                reglementaire DU PROTOTYPE, A00003 serait mieux ordonne que le
+                titulaire final sur ce poste. L'etat final resulte neanmoins d'une
+                optimisation (chaines et/ou PRODUCT_POLICY).
+                Le journal exact de la decision N'EST PAS DISPONIBLE dans cette demo.
+                Ce n'est PAS une justification administrative officielle.

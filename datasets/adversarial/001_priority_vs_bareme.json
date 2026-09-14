@@ -1,0 +1,20 @@
+{
+  "id": "001_priority_vs_bareme",
+  "description": "Handicap priority must beat any bareme",
+  "agents": [
+    {"id": "H", "echelon": 1, "handicap_500": true},
+    {"id": "R", "echelon": 11, "children": 100}
+  ],
+  "posts": [
+    {"id": "X", "commune": "BT", "support": "ECEL", "vacant": true}
+  ],
+  "wishes": {
+    "H": [{"rank": 1, "post_ids": ["X"], "precise": true}],
+    "R": [{"rank": 1, "post_ids": ["X"], "precise": true}]
+  },
+  "expected": {
+    "H": {"post_id": "X", "kind": "ASSIGNED"},
+    "R": {"kind_not": "ASSIGNED_to_X"}
+  },
+  "assertions": ["priority_dominates_bareme"]
+}

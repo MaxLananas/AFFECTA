@@ -1,0 +1,154 @@
+{
+  "demo_id": "AFFECTA-DEMO-2026-08-11",
+  "seed": 20260811,
+  "n_agents": 1200,
+  "max_wishes": 20,
+  "dataset": {
+    "id": "guadeloupe-2026-alpha",
+    "version": "2026.08.11-alpha1",
+    "posts": 1310,
+    "groups": 435,
+    "source_hashes": {
+      "VOEUX_PRECIS": "dc8163839d3ee21d2e3a8ce9abb84d49bfaa65d619b8c1b1e2520092ba44448f",
+      "ASSIMILES_COMMUNES": "9dcf9a997b9b57d5868c5a2cd599a9d64e1f0d5e7eddacddcbb995cff3077bcc",
+      "AUTRE_MOB": "b41e27879d0e4fc34847c139e3f8e9918a465983143771d5b20428156e49f729",
+      "AUTRE_ZONE": "ea961866487c3effadec51c1b3ecf26a5573fc99223f4e2ce76bbaf2253b66db"
+    },
+    "wishes": "SYNTHETIC — not real 2026 teacher wishes"
+  },
+  "methods": {
+    "NAIVE": {
+      "method": "NAIVE",
+      "assigned": 239,
+      "unassigned": 0,
+      "voeu1": 30,
+      "top3": 78,
+      "avg_rank": 6.657,
+      "empty": null,
+      "under_50": null,
+      "remaining_vacant": 1454,
+      "ms": 4.1,
+      "optimality": "UNKNOWN",
+      "coverage_metric": "NOT_APPLICABLE_DIFFERENT_DEFINITION"
+    },
+    "LIBERATION": {
+      "method": "LIBERATION",
+      "assigned": 1089,
+      "unassigned": 0,
+      "voeu1": 146,
+      "top3": 405,
+      "avg_rank": 5.783,
+      "empty": null,
+      "under_50": null,
+      "remaining_vacant": 1454,
+      "ms": 268.2,
+      "optimality": "UNKNOWN",
+      "coverage_metric": "NOT_APPLICABLE_DIFFERENT_DEFINITION"
+    },
+    "TEACHER_FIRST": {
+      "method": "AFFECTA_TEACHER_FIRST",
+      "assigned": 1199,
+      "unassigned": 0,
+      "voeu1": 405,
+      "top3": 831,
+      "avg_rank": 3.12,
+      "empty": 346,
+      "under_50": 278,
+      "remaining_vacant": 1454,
+      "ms": 519.1,
+      "optimality": "UNKNOWN",
+      "policy_version": "coverage-v3",
+      "severity_gain": 669,
+      "swaps": 623,
+      "cost_per_severity_gain": 0.0,
+      "non_regression_ok": true,
+      "result_hash": "0ea2792c91fb88db",
+      "strained_75": 44,
+      "empty_label": "bases_support_fill0_coverage_v3",
+      "empty_is_school": false
+    },
+    "BALANCED": {
+      "method": "AFFECTA_BALANCED",
+      "assigned": 1199,
+      "unassigned": 0,
+      "voeu1": 307,
+      "top3": 720,
+      "avg_rank": 3.811,
+      "empty": 286,
+      "under_50": 299,
+      "remaining_vacant": 1454,
+      "ms": 966.9,
+      "optimality": "UNKNOWN",
+      "policy_version": "coverage-v3",
+      "severity_gain": 859,
+      "swaps": 512,
+      "cost_per_severity_gain": 0.286,
+      "non_regression_ok": true,
+      "result_hash": "d4d40f0e59c27ee5",
+      "strained_75": 36,
+      "empty_label": "bases_support_fill0_coverage_v3",
+      "empty_is_school": false
+    },
+    "COVERAGE_FIRST": {
+      "method": "AFFECTA_COVERAGE_FIRST",
+      "assigned": 1199,
+      "unassigned": 0,
+      "voeu1": 283,
+      "top3": 679,
+      "avg_rank": 3.982,
+      "empty": 274,
+      "under_50": 299,
+      "remaining_vacant": 1454,
+      "ms": 980.6,
+      "optimality": "UNKNOWN",
+      "policy_version": "coverage-v3",
+      "severity_gain": 913,
+      "swaps": 509,
+      "cost_per_severity_gain": 0.493,
+      "non_regression_ok": true,
+      "result_hash": "60cda21892ee4e53",
+      "strained_75": 32,
+      "empty_label": "bases_support_fill0_coverage_v3",
+      "empty_is_school": false
+    }
+  },
+  "dossiers": {
+    "D1_voeu1": {
+      "agent": "A00005",
+      "reasons": [
+        "YOU_GOT_THIS_POST"
+      ],
+      "text": "MON AFFECTATION\n  Agent              A00005\n  Affecte a          203486#0\n  Rang obtenu        1\n  Statut             ASSIGNED\n\nPourquoi pas le voeu n°1 ?\n\n  Poste 203486#0\n    Motif     : YOU_GOT_THIS_POST\n"
+    },
+    "D2_reglementaire": {
+      "agent": "A00014",
+      "reasons": [
+        "CONCURRENT_MIEUX_CLASSE"
+      ],
+      "text": "MON AFFECTATION\n  Agent              A00014\n  Affecte a          162882#3\n  Rang obtenu        3\n  Statut             ASSIGNED\n\nPourquoi pas le voeu n°1 ?\n\n  Poste 162901\n    Motif     : un autre candidat a ete mieux classe\n    Categorie : REGLEMENTAIRE\n    Concurrent: A00404\n    Votre priorite / bareme     : 99 / 146\n    Concurrent priorite / bareme: 99 / 183\n"
+    },
+    "D3_optimisation": {
+      "agent": "A00003",
+      "reasons": [
+        "DECISION_OPTIMISATION"
+      ],
+      "text": "MON AFFECTATION\n  Agent              A00003\n  Affecte a          203490\n  Rang obtenu        8\n  Statut             ASSIGNED\n\nPourquoi pas le voeu n°1 ?\n\n  Poste 162688#0\n    Motif     : decision d'optimisation (pas un classement purement reglementaire)\n    Categorie : OPTIMISATION\n    Detail    : Selon le classement reglementaire seul, votre dossier etait mieux place. Le poste a neanmoins ete attribue dans le cadre d'une optimisation (chaine de liberation ou politique de couverture).\n",
+      "presentation_text": "Dans l'etat final, un autre agent occupe le poste. D'apres le scorer reglementaire DU PROTOTYPE, A00003 serait mieux ordonne que le titulaire final. L'etat final resulte d'une optimisation. Le journal exact de la decision n'est pas disponible. Preuve partielle."
+    }
+  },
+  "disclaimer": [
+    "AFFECTA is not MVT1D and does not claim to reproduce official assignments.",
+    "Wishes in this demo are synthetic.",
+    "Some regulatory rules remain UNKNOWN.",
+    "Large-scale optimality is not proven (status UNKNOWN).",
+    "TEACHER/BALANCED/COVERAGE are PRODUCT_POLICY choices, not administrative rules."
+  ],
+  "metric_framework": {
+    "document": "GLOSSAIRE_METRIQUES.md",
+    "empty_definition_affecta_v3": "Number of support bases (post id without #) with fill==0 in Coverage v3 model. NOT an administrative school count. NOT comparable to NAIVE/LIBERATION empty fields if present.",
+    "assigned_note": "1199/1200 agents ASSIGNED; 1 agent not assigned. Do not claim all professors assigned.",
+    "forbidden_public_comparison": "Do not compare NAIVE empty to TEACHER empty.",
+    "performance_10k": "Measured on a separate fully synthetic instance, not Guadeloupe 2026 movement data.",
+    "d3_note": "OPTIMISATION category is partial proof: post-hoc score comparison, no decision journal in this demo."
+  }
+}

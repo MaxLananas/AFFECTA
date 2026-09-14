@@ -1,0 +1,17 @@
+{
+  "id": "002_rc_apc_non_cumul",
+  "description": "RC and APC cannot be combined",
+  "agents": [
+    {"id": "A", "echelon": 6, "rc_points": 250, "apc_points": 250}
+  ],
+  "posts": [
+    {"id": "X", "commune": "BT", "support": "ECEL", "vacant": true}
+  ],
+  "wishes": {
+    "A": [{"rank": 1, "post_ids": ["X"], "precise": true}]
+  },
+  "expected": {
+    "score_rejection": "RC_APC_NON_CUMULABLE"
+  },
+  "assertions": ["non_cumul_rc_apc"]
+}
