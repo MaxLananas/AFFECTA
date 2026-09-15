@@ -25,7 +25,13 @@ from movement_engine.explain.certificate import (
 
 def _resolve_engine(name: str):
     """Return the solver callable for a CLI engine name."""
-    if name in ("da", "deferred", "deferred_acceptance"):
+    if name in ("da", "deferred", "deferred_acceptance", "movement", "mvt1d"):
+        # Full confirmed MVT1D procedure: deferred acceptance then office-assignment
+        # (extension) of obligatory participants. This is the production default.
+        from movement_engine.solver.pipeline import run_movement
+        return run_movement
+    if name in ("da-only", "da-nostep", "phase1"):
+        # Phase 1 in isolation (no extension) — useful for comparison/diagnostics.
         return run_deferred_acceptance
     if name in ("native", "da-native", "c"):
         from movement_engine.solver.engine_native import (
@@ -39,7 +45,7 @@ def _resolve_engine(name: str):
         return run_deferred_acceptance_native
     if name in ("legacy", "greedy", "engine"):
         return run_engine
-    raise SystemExit(f"unknown engine: {name!r} (use 'da', 'native' or 'legacy')")
+    raise SystemExit(f"unknown engine: {name!r} (use 'da', 'da-only', 'native' or 'legacy')")
 
 
 def make_dataset(n_agents: int, n_posts: int, seed: int = 20260810):
@@ -57,15 +63,21 @@ def make_dataset(n_agents: int, n_posts: int, seed: int = 20260810):
             holder_id=f"A{i:05d}" if not vacant and i < n_agents else None,
         )
     for i in range(n_agents):
+        current = f"X{i:05d}" if i < n_posts and not posts[f"X{i:05d}"].vacant else None
         agents[f"A{i:05d}"] = Agent(
             id=f"A{i:05d}",
             echelon=(i % 11) + 1,
             children=i % 4,
             handicap_500=(i % 200 == 0),
             boe=(i % 150 == 0),
-            current_post_id=f"X{i:05d}" if i < n_posts and not posts[f"X{i:05d}"].vacant else None,
+            current_post_id=current,
             aen_points=30 + (i % 10) * 10,
+            aen_months=(i % 25) * 12,
+            echelon_months=(i % 5) * 12,
             medical_grave=(i % 300 == 0),
+            # Un agent sans poste actuel est un entrant -> participant obligatoire
+            # (doit recevoir une affectation). Les titulaires sont volontaires.
+            participation="obligatoire" if current is None else "volontaire",
         )
         n_w = rng.randint(2, 6)
         pids = [f"X{rng.randint(0, n_posts - 1):05d}" for _ in range(n_w)]
@@ -265,11 +277,11 @@ def main():
     p_run = sub.add_parser("run")
     p_run.add_argument("--agents", type=int, default=10000)
     p_run.add_argument("--seed", type=int, default=20260810)
-    p_run.add_argument("--engine", type=str, default="da", help="da (default) | native | legacy")
+    p_run.add_argument("--engine", type=str, default="da", help="da (default, full MVT1D two-step) | da-only | native | legacy")
 
     p_bench = sub.add_parser("benchmark")
     p_bench.add_argument("--large", action="store_true")
-    p_bench.add_argument("--engine", type=str, default="da", help="da (default) | native | legacy")
+    p_bench.add_argument("--engine", type=str, default="da", help="da (default, full MVT1D two-step) | da-only | native | legacy")
 
     p_cmp = sub.add_parser("compare")
     p_cmp.add_argument("--large", action="store_true")

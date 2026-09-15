@@ -79,6 +79,32 @@ réglementaire de 40 km) ; la mesure de carte scolaire mobilise la hiérarchie
 école → commune → communes limitrophes. Ces mécanismes reposent sur un modèle
 géographique des trente-deux communes de Guadeloupe (`regulatory/geography.py`).
 
+### Procédure en deux temps
+
+Le mouvement se déroule en deux temps enchaînés, confirmés par plusieurs académies
+(Bordeaux, Toulouse, Strasbourg) et les organisations professionnelles :
+
+1. **Phase principale** — tous les vœux (précis et groupes) sont traités par acceptation
+   différée. Elle produit l'unique affectation stable, optimale pour les enseignants.
+   Un titulaire sans vœu satisfait reste sur son poste actuel (maintien).
+2. **Phase d'extension** — les **participants obligatoires** (entrants, stagiaires,
+   réintégrations, mesures de carte scolaire non réaffectées) qui n'ont obtenu aucun vœu
+   *doivent* recevoir un poste : ils sont affectés d'office sur un poste resté vacant,
+   selon un ordre déterministe (demande valide d'abord, puis barème décroissant), à titre
+   provisoire pour une demande valide, définitif pour une demande incomplète.
+
+Les deux phases sont enchaînées par `solver/pipeline.py` (moteur `da` par défaut). La phase
+d'extension ne remplit que des postes restés vacants : elle ne peut donc jamais déloger un
+agent affecté par la phase principale et préserve intégralement sa stabilité (absence
+d'envie justifiée vérifiée après enchaînement). Les affectations d'office sont tracées
+(`chain_id = EXTENSION_PRO | EXTENSION_TPD`) et restent distinctes des affectations sur vœu.
+Le moteur `da-only` exécute la phase principale seule, à fins de comparaison.
+
+Le seuil de vœux groupe requis pour qu'une demande obligatoire soit *valide* varie selon
+le département (de 2 à 5) : c'est un paramètre de politique produit
+(`extension.DEFAULT_MOB_THRESHOLD`, défaut 2), explicitement distingué des règles
+réglementaires.
+
 ---
 
 ## 4. Architecture
@@ -91,9 +117,10 @@ regulatory/
   geography.py          Modèle géographique des communes : distances, adjacences
 solver/
   engine.py             Moteur historique (dictature sérielle) — conservé pour comparaison
-  deferred_acceptance.py  Solveur stable par acceptation différée (moteur par défaut)
-  engine_native.py      Pont ctypes vers le cœur natif C (résultat identique)
+  deferred_acceptance.py  Phase principale : solveur stable par acceptation différée
   extension.py          Phase d'extension : affectation d'office des participants obligatoires
+  pipeline.py           Procédure MVT1D complète en deux temps (phase principale + extension)
+  engine_native.py      Pont ctypes vers le cœur natif C (résultat identique)
 native/            Cœur C haute performance (acceptation différée à l'échelle du million)
 graph/             Graphe de dépendances, composantes fortement connexes, cycles
 optimizer/         Couplage biparti pur-Python, objectifs, satisfaction, bornes
@@ -121,7 +148,8 @@ Commandes principales :
 
 ```bash
 python3 -m movement_engine test                 # suite de tests (sans pytest)
-python3 -m movement_engine run --agents 10000   # campagne (acceptation différée par défaut)
+python3 -m movement_engine run --agents 10000   # campagne (procédure MVT1D complète par défaut)
+python3 -m movement_engine run --engine da-only # phase principale seule (sans extension)
 python3 -m movement_engine run --engine native  # cœur natif C (résultat identique)
 python3 -m movement_engine run --engine legacy  # moteur historique (comparaison)
 python3 -m movement_engine compare              # acceptation différée contre moteur historique

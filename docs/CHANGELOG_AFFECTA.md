@@ -101,10 +101,40 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
 
 ---
 
+## Vague 9 — Cœur parallèle 100 M et enchaînement de la procédure en deux temps ✅
+- **Démonstrateur natif parallèle** `native/affecta_mega.c` : acceptation différée
+  sans verrou (pthreads) à l'échelle de **100 millions d'agents**, préférences
+  reconstruites à la demande par oracle de hachage (aucune proposition matérialisée,
+  ~2,1 Gio à 100 M). ~5 M agents/s sur 2 cœurs : 1 M ~0,2 s, 10 M ~1,9 s, 50 M < 10 s,
+  100 M ~20 s ; **100 % affectés** (comblement stable) et **0 envie justifiée** (audit
+  `verify` intégré). Déterministe (1/2/4 fils → même appariement). Câblé au Makefile
+  (`make mega`, `make mega-bench`) ; autonome, hors chemin de production.
+- **Enchaînement de la procédure MVT1D en deux temps** `solver/pipeline.py` (`run_movement`) :
+  jusqu'ici la phase d'extension existait mais n'était JAMAIS enchaînée à la phase
+  principale dans un run standard — un participant obligatoire non satisfait ressortait
+  donc `UNASSIGNED`, ce qui ne correspond PAS à la procédure réelle. `run_movement` joint
+  les deux temps en une exécution auditable :
+  - dérive le nombre de vœux MOB (vœux groupes) par agent ;
+  - n'affecte d'office que les obligatoires non satisfaits, sur postes vacants ;
+  - recompose un `EngineResult` cohérent (hachage recalculé, `office_assignments`,
+    `method = DEFERRED_ACCEPTANCE+EXTENSION`).
+  - **Effet mesuré** (instance rare, 300 entrants en forte collision) :
+    DA seule 21 affectés / 279 non affectés → pipeline **300 affectés / 0 non affecté**
+    (279 affectations d'office), **0 envie justifiée** — la phase principale est préservée
+    à l'identique.
+- **Moteur par défaut** de la CLI (`run`) : `da` = procédure complète (`run_movement`).
+  Nouveau moteur `da-only` pour la phase principale seule (diagnostic/comparaison). Le jeu
+  synthétique de démonstration marque désormais les agents sans poste comme obligatoires
+  (entrants), rendant l'enchaînement visible.
+- Tests : **76 passed / 0 failed** (ajout `tests/test_pipeline.py`, 8 tests : placement
+  des obligatoires, préservation de la phase 1, absence d'envie, déterminisme, comptage MOB).
+
+---
+
 ## Reste à faire (pistes priorisées)
 
-- Intégrer DA au runner de données réelles (`datasets/guadeloupe_2026/alpha_runner.py`)
-  et régénérer `alpha_report.json` avec les métriques de stabilité.
+- Régénérer `alpha_report.json` avec les métriques de la procédure complète en deux temps
+  (`run_movement`) et les taux de satisfaction/stabilité associés.
 - Vœux groupes : modéliser le sous-rang dans DA de bout en bout (données de composition
   de groupe restent UNKNOWN dans les sources).
 - Barème de référence : brancher `reference_registry()` derrière un flag pour des
