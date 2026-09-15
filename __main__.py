@@ -27,9 +27,19 @@ def _resolve_engine(name: str):
     """Return the solver callable for a CLI engine name."""
     if name in ("da", "deferred", "deferred_acceptance"):
         return run_deferred_acceptance
+    if name in ("native", "da-native", "c"):
+        from movement_engine.solver.engine_native import (
+            run_deferred_acceptance_native,
+            native_available,
+        )
+        if not native_available():
+            raise SystemExit(
+                "native core not built; run `make -C native` (falls back to 'da' otherwise)"
+            )
+        return run_deferred_acceptance_native
     if name in ("legacy", "greedy", "engine"):
         return run_engine
-    raise SystemExit(f"unknown engine: {name!r} (use 'da' or 'legacy')")
+    raise SystemExit(f"unknown engine: {name!r} (use 'da', 'native' or 'legacy')")
 
 
 def make_dataset(n_agents: int, n_posts: int, seed: int = 20260810):
@@ -255,11 +265,11 @@ def main():
     p_run = sub.add_parser("run")
     p_run.add_argument("--agents", type=int, default=10000)
     p_run.add_argument("--seed", type=int, default=20260810)
-    p_run.add_argument("--engine", type=str, default="da", help="da (default) | legacy")
+    p_run.add_argument("--engine", type=str, default="da", help="da (default) | native | legacy")
 
     p_bench = sub.add_parser("benchmark")
     p_bench.add_argument("--large", action="store_true")
-    p_bench.add_argument("--engine", type=str, default="da", help="da (default) | legacy")
+    p_bench.add_argument("--engine", type=str, default="da", help="da (default) | native | legacy")
 
     p_cmp = sub.add_parser("compare")
     p_cmp.add_argument("--large", action="store_true")

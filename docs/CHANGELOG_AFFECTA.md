@@ -50,6 +50,26 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
   (relit uniquement résultat + scores). Intégré à `movement_engine run`.
 - Démonstration : sur 2 000 agents, DA **stable**, ancien moteur **non stable**.
 
+## Vague 7 — Cœur natif haute performance (passage au million d'agents) ✅
+- `native/affecta_core.c` : acceptation différée côté enseignants en C sur disposition
+  **CSR compacte** (int32), file à anneau + pile par poste avec éviction du plus faible.
+  Compilé en `libaffecta.so` (`-O3 -march=native`).
+- `solver/engine_native.py` : pont **ctypes**. Réutilise `_build_preferences` /
+  `_effective_capacity` du solveur de référence → **sémantique réglementaire identique**
+  (clé par poste, droit du titulaire, vœu propre poste ignoré, capacités multi-postes).
+  Repli automatique sur le solveur Python si la lib n'est pas compilée.
+- **Équivalence stricte** : résultat **byte-à-byte identique** à
+  `run_deferred_acceptance(..., allow_pure_exchanges=True)` — 20/20 hachages égaux
+  (seeds × tailles, jeu réel Guadeloupe). Gardé par `tests/test_native.py`.
+- **Correction** : `native/affecta_verify.c` vérifie en force brute l'absence d'envie
+  justifiée jusqu'à 500 000 agents (0 violation).
+- **Performance mesurée** (2 vCPU, mono-thread, cf. `native/BENCHMARKS.md`) :
+  - 1 000 000 agents (12,6 M propositions) : appariement en **0,58 s** (1,7 M ag/s)
+  - 5 000 000 agents (63,1 M propositions) : **3,89 s**
+  - 10 000 000 agents (126,2 M propositions) : **8,28 s**, pic mémoire < 2,5 Gio
+  - Objectif « milliers d'agents en secondes » **dépassé de plusieurs ordres de grandeur**.
+- CLI : `--engine native` disponible sur `run` / `benchmark`.
+
 ---
 
 ## Reste à faire (pistes priorisées)

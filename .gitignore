@@ -5,3 +5,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 /movement_engine
+
+# native build artifacts
+native/*.so
+native/affecta_bench
+native/affecta_verify
+native/*.o
