@@ -44,7 +44,7 @@ marqués et isolés. L'inventaire complet figure dans `docs/REGULATORY_SOURCES.m
 | Équité (aucune envie justifiée) | Solveur par acceptation différée (Gale–Shapley côté enseignants) produisant une affectation stable qui respecte exactement l'ordre réglementaire poste par poste. Vérifiée par un contrôleur indépendant (`explain/stability.py`). |
 | Optimalité pour les enseignants | Parmi toutes les affectations stables, l'acceptation différée maximise la satisfaction des vœux des enseignants. |
 | Non-manipulabilité | L'acceptation différée côté enseignants est *strategy-proof* : déclarer des vœux non sincères ne peut pas améliorer la situation d'un agent. |
-| Performance | Cœur natif en C traitant plusieurs millions d'agents en quelques secondes sur un seul cœur (section 6). |
+| Performance | Cœur natif en C traitant plusieurs millions d'agents en quelques secondes ; démonstrateur parallèle tenant l'échelle de la centaine de millions d'agents (section 6). |
 | Traçabilité | Certificats d'intégrité et de stabilité vérifiables indépendamment ; explications « pourquoi pas » ; barème décomposé et sourcé pour chaque candidature. |
 | Reproductibilité | Résultat déterministe (départage réglementaire complet), donc empreinte de résultat stable. |
 | Absence de dépendance | Bibliothèque standard Python uniquement ; cœur natif compilé avec la seule chaîne C standard. |
@@ -154,6 +154,42 @@ Le cœur natif produit une affectation identique, bit pour bit, à celle du solv
 de référence (contrôlé sur l'ensemble des instances par `tests/test_native.py`). Il s'agit
 de la même décision, exécutée plus rapidement. En l'absence de bibliothèque compilée,
 AFFECTA revient automatiquement au solveur Python.
+
+### Démonstrateur de débit (100 millions d'agents)
+
+Pour éprouver l'algorithme bien au-delà de tout besoin réel, `native/affecta_mega.c` exécute
+la même acceptation différée en parallèle (pthreads, sans verrou) à l'échelle de la centaine
+de millions d'agents. À ce volume, stocker une liste de vœux par agent est impossible (des
+dizaines de gigaoctets) : chaque vœu et sa clé de classement sont donc reconstruits à la
+demande par un oracle de hachage déterministe, sans jamais matérialiser la moindre
+proposition. Chaque poste est une unique cellule atomique de 64 bits ; les propositions se
+résolvent par maximum atomique et les agents évincés se re-proposent. L'ordre des propositions
+n'affectant pas l'appariement stable optimal-enseignant, l'exécution parallèle rend le même
+résultat qu'une exécution séquentielle, sans verrou par poste.
+
+```bash
+make -C native mega
+./native/affecta_mega 100000000 42 2         # cent millions d'agents, chronométré
+./native/affecta_mega 100000000 42 2 verify  # + audit exhaustif de stabilité
+```
+
+Mesures sur le bac à sable de développement (2 vCPU Xeon 2,60 GHz, 3,9 Go) :
+
+| Agents | Appariement | Débit | Affectés | Stabilité |
+| ---: | ---: | ---: | ---: | :---: |
+| 1 000 000 | 0,19 s | 5,2 M agents/s | 100,0 % | 0 envie |
+| 10 000 000 | 1,86 s | 5,4 M agents/s | 100,0 % | 0 envie |
+| 50 000 000 | 9,71 s | 5,1 M agents/s | 100,0 % | 0 envie |
+| 100 000 000 | ~20 s | ~5,0 M agents/s | 100,0 % | 0 envie |
+
+Le débit est limité par la latence des accès mémoire aléatoires sur le tableau des postes
+(environ 840 Mo à 100 M) : il progresse donc avec la bande passante mémoire et le nombre de
+cœurs. Sur ces deux cœurs partagés, l'appariement se maintient à environ 5 millions d'agents
+par seconde, avec une variabilité d'exécution notable liée à la charge de la machine. Chaque
+mesure est confirmée par l'audit `verify` — aucune envie justifiée sur l'appariement produit.
+Ce démonstrateur est autonome (aucune dépendance à `affecta_core.c`) et n'entre pas dans le
+chemin de production : la campagne départementale réelle reste résolue en quelques dizaines de
+millisecondes par le solveur Python.
 
 Le détail des mesures et de la vérification figure dans `native/BENCHMARKS.md`.
 

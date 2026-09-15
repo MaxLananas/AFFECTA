@@ -31,6 +31,49 @@ done
 d'agents le générateur réduit le nombre de vœux à 8 afin de tenir dans les 3,8 Gio de la
 machine de mesure ; le solveur, lui, reste linéaire en nombre de propositions.
 
+## Démonstrateur parallèle à 100 millions d'agents (`affecta_mega`)
+
+`native/affecta_mega.c` pousse le même algorithme d'acceptation différée bien au-delà de
+tout besoin opérationnel, en parallèle (pthreads, sans verrou par poste), jusqu'à la
+centaine de millions d'agents. À ce volume, stocker une liste de vœux par agent
+représenterait des dizaines de gigaoctets : chaque vœu et sa clé de classement sont donc
+reconstruits à la demande par un oracle de hachage déterministe (splitmix64), sans jamais
+matérialiser la moindre proposition. L'empreinte mémoire reste ainsi d'environ 2,1 Gio à
+100 M d'agents. Chaque poste est une unique cellule atomique 64 bits (clé de classement
+37 bits au-dessus d'un identifiant d'agent 27 bits) ; les propositions se résolvent par
+maximum atomique et les évincés se re-proposent via une liste de travail (frontière) — le
+coût total est proportionnel au nombre de propositions, jamais un balayage O(n) par tour.
+
+Reproduire :
+
+```sh
+make -C native mega
+for n in 1000000 10000000 50000000 100000000; do
+  ./native/affecta_mega $n 42 2 verify
+done
+```
+
+| Agents | Postes | Appariement (ms) | Débit (M ag/s) | Tours | Affectés | Stabilité |
+| ---: | ---: | ---: | ---: | ---: | ---: | :---: |
+| 1 000 000 | 1 050 016 | 191 | 5,2 | 12 | 100,000 % | 0 envie |
+| 10 000 000 | 10 500 016 | 1 861 | 5,4 | 13 | 100,000 % | 0 envie |
+| 50 000 000 | 52 500 016 | 9 706 | 5,1 | 14 | 100,000 % | 0 envie |
+| 100 000 000 | 105 000 016 | ~20 000 | ~5,0 | 15 | 100,000 % | 0 envie |
+
+100 % d'affectation est atteint par une passe de comblement (`backfill`) stable : les
+créneaux restés vides ne sont, par construction, convoités par personne, donc les y placer
+ne crée aucune envie justifiée. La colonne stabilité provient de l'audit `verify` intégré
+(option `verify` en 4ᵉ argument), qui vérifie l'absence d'envie justifiée sur
+l'appariement produit *avant* comblement. Le résultat est déterministe et indépendant du
+nombre de fils (1, 2 ou 4 fils donnent le même appariement).
+
+Le débit est borné par la latence des accès mémoire aléatoires sur le tableau des postes
+(environ 840 Mo à 100 M) ; il progresse donc avec la bande passante mémoire et le nombre de
+cœurs, et présente une variabilité d'exécution notable sur une machine partagée (l'étape
+d'appariement à 100 M a été mesurée entre 19 et 24 s selon la charge). Ce démonstrateur est
+autonome (aucune dépendance à `affecta_core.c`) et n'entre pas dans le chemin de
+production.
+
 ### Note d'optimisation — clé de comparaison compactée
 
 La clé de classement réglementaire (priorité, barème, rang, sous-rang, puis les trois

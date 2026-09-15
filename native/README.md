@@ -15,7 +15,8 @@ titulaire sur son poste. La clé de classement est repliée sans perte dans deux
 | `affecta_core.c` / `.h` | Noyau DA sur disposition CSR compacte (int32). File d'attente à anneau, pile par poste avec éviction du candidat le plus faible. |
 | `affecta_bench.c` | Générateur synthétique (forme statistique calquée sur le jeu réel) + chronométrage. |
 | `affecta_verify.c` | Vérificateur force brute de la stabilité (aucune envie justifiée) + capacités. |
-| `Makefile` | `make` (lib + binaires), `make bench`, `make verify`, `make clean`. |
+| `affecta_mega.c` | Démonstrateur parallèle (pthreads, sans verrou) tenant l'échelle de 100 M d'agents via un oracle de préférences par hachage ; audit de stabilité intégré. Autonome. |
+| `Makefile` | `make` (lib + binaires), `make bench`, `make verify`, `make mega`, `make mega-bench`, `make clean`. |
 
 ## Build
 
@@ -55,3 +56,19 @@ priorités légales art. 60). Voir `BENCHMARKS.md` pour le tableau complet.
 À titre de comparaison, la campagne réelle Guadeloupe (1 310 postes, ~1 200 agents) est
 résolue en **quelques dizaines de millisecondes** ; l'objectif « milliers d'agents en
 secondes » est dépassé de plusieurs ordres de grandeur.
+
+### Démonstrateur parallèle (100 M d'agents)
+
+Le même algorithme, poussé bien au-delà de tout besoin réel, en parallèle et à l'échelle
+de la centaine de millions d'agents (préférences reconstruites à la demande par un oracle
+de hachage — aucune proposition matérialisée) :
+
+```sh
+make -C native mega
+./native/affecta_mega 100000000 42 2 verify   # cent millions d'agents + audit de stabilité
+```
+
+Sur ces deux cœurs : 1 M en ~0,2 s, 10 M en ~1,9 s, 50 M en moins de 10 s, 100 M en ~20 s,
+toujours **100 % affectés** et **stables (0 envie justifiée)**, résultat déterministe et
+indépendant du nombre de fils. Débit borné par la latence mémoire (voir `BENCHMARKS.md`).
+Ce binaire est autonome et n'entre pas dans le chemin de production.

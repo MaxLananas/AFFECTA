@@ -10,5 +10,6 @@ __pycache__/
 native/*.so
 native/affecta_bench
 native/affecta_verify
+native/affecta_mega
 native/*.o
 /AFFECTA
