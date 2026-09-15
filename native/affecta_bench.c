@@ -23,6 +23,7 @@ extern int32_t affecta_da_solve(
     const int32_t *off, const int32_t *pref_post,
     const int32_t *pref_priority, const int32_t *pref_bareme,
     const int32_t *pref_wish, const int32_t *pref_sous,
+    const int32_t *pref_aen, const int32_t *pref_ech,
     const uint8_t *pref_incumbent, const uint64_t *agent_tie,
     const int32_t *post_capacity, const int32_t *cap_offset,
     int32_t *out_post, int32_t *out_wish);
@@ -49,8 +50,10 @@ int main(int argc, char **argv) {
 
     /* Real dataset shape: ~2 agents per post-slot, ~19% of posts vacant. Scale posts
      * with agents so capacity slightly exceeds demand (a solvable campaign). */
-    int32_t n_posts   = (int32_t)((int64_t)n_agents * 60 / 100 + 16);
-    int32_t wishes    = 12;                 /* precise wishes per agent */
+    int32_t  n_posts   = (int32_t)((int64_t)n_agents * 60 / 100 + 16);
+    /* Fewer wishes for very large N so the generator's per-proposal arrays fit in a
+     * few GB of RAM. The solver itself scales linearly regardless. */
+    int32_t  wishes    = n_agents > 6000000 ? 8 : 12;
 
     uint64_t s = seed;
 
@@ -77,13 +80,15 @@ int main(int argc, char **argv) {
     int32_t *pbar   = (int32_t *)malloc((size_t)total_pref * sizeof(int32_t));
     int32_t *pwish  = (int32_t *)malloc((size_t)total_pref * sizeof(int32_t));
     int32_t *psous  = (int32_t *)malloc((size_t)total_pref * sizeof(int32_t));
+    int32_t *paen   = (int32_t *)malloc((size_t)total_pref * sizeof(int32_t));
+    int32_t *pech   = (int32_t *)malloc((size_t)total_pref * sizeof(int32_t));
     uint8_t *pinc   = (uint8_t *)malloc((size_t)total_pref * sizeof(uint8_t));
     uint64_t*tie    = (uint64_t*)malloc((size_t)n_agents * sizeof(uint64_t));
     int32_t *opost  = (int32_t *)malloc((size_t)n_agents * sizeof(int32_t));
     int32_t *owish  = (int32_t *)malloc((size_t)n_agents * sizeof(int32_t));
 
     if (!cap || !capoff || !off || !pp || !ppri || !pbar || !pwish ||
-        !psous || !pinc || !tie || !opost || !owish) {
+        !psous || !paen || !pech || !pinc || !tie || !opost || !owish) {
         fprintf(stderr, "allocation failed for %d agents\n", n_agents);
         return 1;
     }
@@ -104,12 +109,16 @@ int main(int argc, char **argv) {
         else if (pr < 30)  { priority = 5; bareme = 200; }                          /* suppr. poste */
         else               { priority = 15; bareme = 21 + (int32_t)rnd(&s, 260); } /* barème standard */
 
+        /* discriminants: AEN and échelon seniority in months (career-scale spread) */
+        int32_t aen = (int32_t)rnd(&s, 480);   /* up to 40 years of EN service */
+        int32_t ech = (int32_t)rnd(&s, 60);    /* up to 5 years in current échelon */
+
         /* 62% are incumbents holding a current post that they may keep. */
         int32_t has_incumbent = rnd(&s, 100) < 62;
         if (has_incumbent) {
             int32_t home = (int32_t)rnd(&s, (uint32_t)n_posts);
             pp[w] = home; ppri[w] = priority; pbar[w] = bareme;
-            pwish[w] = 0; psous[w] = 0; pinc[w] = 1; ++w;
+            pwish[w] = 0; psous[w] = 0; paen[w] = aen; pech[w] = ech; pinc[w] = 1; ++w;
         }
 
         for (int32_t k = 0; k < wishes; ++k) {
@@ -118,6 +127,8 @@ int main(int argc, char **argv) {
             pbar[w] = bareme;
             pwish[w]= k + 1;
             psous[w]= (int32_t)rnd(&s, 3);
+            paen[w] = aen;
+            pech[w] = ech;
             pinc[w] = 0;
             ++w;
         }
@@ -127,7 +138,7 @@ int main(int argc, char **argv) {
     double t1 = now_ms();
 
     int32_t assigned = affecta_da_solve(
-        n_agents, n_posts, off, pp, ppri, pbar, pwish, psous, pinc, tie,
+        n_agents, n_posts, off, pp, ppri, pbar, pwish, psous, paen, pech, pinc, tie,
         cap, capoff, opost, owish);
 
     double t2 = now_ms();
@@ -152,6 +163,7 @@ int main(int argc, char **argv) {
            (long long)top3, 100.0 * top3 / n_agents);
 
     free(cap); free(capoff); free(off); free(pp); free(ppri); free(pbar);
-    free(pwish); free(psous); free(pinc); free(tie); free(opost); free(owish);
+    free(pwish); free(psous); free(paen); free(pech); free(pinc);
+    free(tie); free(opost); free(owish);
     return 0;
 }

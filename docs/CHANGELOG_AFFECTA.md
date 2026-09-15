@@ -70,6 +70,35 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
   - Objectif « milliers d'agents en secondes » **dépassé de plusieurs ordres de grandeur**.
 - CLI : `--engine native` disponible sur `run` / `benchmark`.
 
+## Vague 8 — Réalisme réglementaire, géographie et optimisation du cœur ✅
+- **Recherche croisée approfondie** (circulaires ac-Bordeaux, ac-Toulouse, ac-Poitiers,
+  ac-Versailles, ac-Lyon, ac-Strasbourg, ac-Limoges, education.gouv, SNUipp, SGEN-CFDT).
+  Consignée dans `docs/REGULATORY_SOURCES.md` (statut par règle).
+- **Chaîne complète des discriminants MVT1D** (REGULATORY_CONFIRMED) : AEN décroissant →
+  ancienneté d'échelon décroissant → tirage aléatoire. `regulatory_key` passe de 5 à
+  7 composantes ; champs `Agent.aen_months` / `echelon_months`.
+- **Modèle géographique** `regulatory/geography.py` : 32 communes de Guadeloupe,
+  adjacences terrestres (symétriques, îles isolées), distances orthodromiques.
+- **Barème enrichi et décomposé** (`regulatory/scorer.py`, réécrit) :
+  - rapprochement de conjoints conditionné à la distance ≥ 40 km ;
+  - bonification progressive de séparation (50/200/350/450) ;
+  - mesure de carte scolaire dégressive école/commune/limitrophe (600/500/250) ;
+  - CIMM (600), éducation prioritaire (REP 45 / REP+ 90), ancienneté de poste par paliers ;
+  - priorités de titre (ASH/CAPPEI, direction) traitées avant le barème.
+  - Comportement historique STRICTEMENT préservé (68 tests, valeurs des tests inchangées).
+- **Phase d'extension** `solver/extension.py` : affectation d'office des participants
+  obligatoires (demandes valides avant incomplètes, barème de base décroissant + discriminant,
+  balayage à ordre fixe, PRO/TPD), exécutée sur les seuls postes vacants — n'altère pas
+  la stabilité de la phase principale.
+- **Métadonnées réelles** propagées depuis `posts.json` (nature, circonscription, profil,
+  exigence de titre) via `alpha_runner.load_real_posts`.
+- **Cœur natif** : clé de classement compactée sans perte en deux mots 64 bits
+  (struct 40 → 24 octets, comparateur à 3 branches). Solve 1 M : 555 ms ; 5 M : 3,71 s ;
+  10 M : 6,86 s. Toujours **byte-à-byte identique** au solveur Python (15/15 empreintes)
+  et **0 envie justifiée** jusqu'à 500 000 agents.
+- **README** réécrit au registre institutionnel (sans emojis, sans ornements).
+- Tests : **68 passed / 0 failed** (ajout de `tests/test_realism.py`, 14 tests).
+
 ---
 
 ## Reste à faire (pistes priorisées)

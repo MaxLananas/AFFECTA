@@ -122,6 +122,81 @@ codes 1–99 départementaux reste **UNKNOWN** (dépend du département).
 
 ---
 
+## Enrichissements réglementaires (recherche croisée, septembre 2026)
+
+### Chaîne de discriminants MVT1D — ordre exact ✅ CONFIRMED
+Convergence de sources indépendantes sur la séquence de départage **après** priorité,
+barème, rang et sous-rang :
+1. **AEN** — ancienneté de fonction dans l'Éducation nationale, décroissante ;
+2. **ancienneté dans l'échelon** détenu, décroissante ;
+3. **numéro aléatoire** de campagne, attribué une fois pour toute la campagne.
+
+Sources :
+- Guide intra ac-Bordeaux — « discriminant 1 : AEN décroissant ; discriminant 2 :
+  ancienneté dans l'échelon détenu décroissant ; discriminant 3 : numéro aléatoire
+  décroissant ». https://www.ac-bordeaux.fr/media/78717/download
+- Circulaire ac-Toulouse (MVT1D) — « barème de base décroissant ; discriminant
+  décroissant ». https://www.ac-toulouse.fr/media/87344/download
+- LDG ac-Poitiers — « 1 le rang de vœu ; 2 l'échelon ; 3 l'ancienneté dans l'échelon ;
+  4 l'ancienneté générale de services ; 5 le numéro attribué à chaque participant ».
+  https://www.ac-poitiers.fr/media/19931/download
+- FSU-SNUipp 76 — « en cas d'égalité : l'ancienneté de fonctions (≠ AGS) … ».
+  https://e-mouvement.snuipp.fr/76/regles/comment-ca-marche-402
+
+➡️ AFFECTA implémente la chaîne complète (`CandidateScore.regulatory_key`, champs
+`aen_months` / `echelon_months`). Les valeurs exactes en Guadeloupe restent à renseigner
+par agent (par défaut neutres).
+
+### Rapprochement de conjoints — seuil de distance ✅ CONFIRMED (structure)
+La bonification RC exige une distance d'au moins **40 km** entre la résidence
+professionnelle de l'agent et celle du conjoint (calcul routier Mappy/Maps).
+- Circulaire SNUipp 69 — « une distance de 40 km ou plus sépare son lieu d'affectation
+  actuelle de la résidence professionnelle de son conjoint ». https://69.snuipp.fr/IMG/pdf/circulaire.pdf
+- Mémento ac-Aix-Marseille 2026 ; annexe ac-Limoges (« au-delà de 40 kilomètres »).
+
+➡️ AFFECTA : `regulatory/geography.py` (distance orthodromique, HYPOTHESIS
+d'approximation du calcul routier) + seuil 40 km dans le barème.
+
+### Bonification progressive de séparation (RC/APC) ✅ CONFIRMED (structure)
+Barème dégressif selon les années de séparation. Valeurs **PROBABLE** (interdép.
+education.gouv / cgteduc-versailles) : 1 an = 50, 2 ans = 200, 3 ans = 350, 4 ans+ = 450.
+Non-cumul RC/APC confirmé ; exclusion des vœux groupes (sauf handicap) confirmée.
+
+### Mesure de carte scolaire — bonification dégressive géographique ✅ CONFIRMED (structure)
+Hiérarchie école → commune d'exercice → communes limitrophes. Valeurs **PROBABLE**
+(ac-versailles 2026 : 600 école / 500 commune / 250 limitrophe ; le vœu de maintien
+déclenche les bonifications dégressives).
+- Circulaire ac-Versailles n°2026-10. http://www.snalc-versailles.fr/uploads/circulaire-mouvement-intra-2026.pdf
+- Circulaire ac-Lyon / SNUipp 69 (niveaux 300/200/100 selon les départements).
+
+➡️ AFFECTA : `_mcs_proximity` s'appuie sur l'adjacence communale de `geography.py`.
+
+### Priorités de titre (ASH/CAPPEI, direction) — traitées avant le barème ✅ CONFIRMED
+Un agent détenteur du titre requis passe avant tout agent non titré, indépendamment du
+barème ; hiérarchie CAPPEI (module exact > module différent > formation en cours > sans
+titre → affectation provisoire).
+- sgen-cfdt « Fonctionnement de l'algorithme MVT1D » (exigence 31 vs 40).
+  https://sgen-cfdt.fr/contenu/uploads/sites/3/2024/03/FONCTIONNEMENT-ALGO-MVT1D-1.pdf
+- ac-Montpellier, ac-Toulouse (annexe ASH), Somme 2025 (priorités 1 à 6 CAPPEI).
+
+➡️ AFFECTA : `Post.required_titles`, `Agent.titles`, `_title_priority` (rangs < 10).
+
+### Participants obligatoires et phase d'extension ✅ CONFIRMED
+Les participants obligatoires doivent saisir au moins 2 vœux MOB (jusqu'à 5 selon le
+département). Sans satisfaction : affectation d'office par « extension » sur poste vacant,
+demandes valides avant demandes incomplètes, barème de base décroissant puis discriminant,
+balayage à ordre fixe des circonscriptions/natures de postes (« vœu balayette » B/999).
+Caractère : provisoire (PRO) si demande valide non satisfaite, définitif (TPD) si demande
+incomplète.
+- ac-Bordeaux (« a minima 5 vœux groupe MOB »), ac-Strasbourg / ac-Paris (« au moins 2 »),
+  ac-Toulouse, ac-Limoges. Barème d'extension = ancienneté service + poste + handicap
+  automatique + éducation prioritaire (glossaire mutation education.gouv, FAQ ac-Guadeloupe).
+
+➡️ AFFECTA : `solver/extension.py` (exécuté après l'acceptation différée, sur postes
+vacants uniquement, ne peut pas déloger une affectation principale).
+
+---
+
 ## Ce qui reste UNKNOWN (à ne pas inventer)
 
 - Composition exacte des vœux groupes (postes membres) — absente des PDF source Guadeloupe.

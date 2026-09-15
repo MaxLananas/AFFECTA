@@ -57,6 +57,8 @@ def _load():
         ctypes.POINTER(ctypes.c_int32),   # pref_bareme
         ctypes.POINTER(ctypes.c_int32),   # pref_wish
         ctypes.POINTER(ctypes.c_int32),   # pref_sous
+        ctypes.POINTER(ctypes.c_int32),   # pref_aen
+        ctypes.POINTER(ctypes.c_int32),   # pref_ech
         ctypes.POINTER(ctypes.c_uint8),   # pref_incumbent
         ctypes.POINTER(ctypes.c_uint64),  # agent_tie
         ctypes.POINTER(ctypes.c_int32),   # post_capacity
@@ -115,6 +117,8 @@ def run_deferred_acceptance_native(
     pref_bar: List[int] = []
     pref_wish: List[int] = []
     pref_sous: List[int] = []
+    pref_aen: List[int] = []
+    pref_ech: List[int] = []
     pref_inc: List[int] = []
     ties: List[int] = [0] * n_agents
 
@@ -133,14 +137,19 @@ def run_deferred_acceptance_native(
                 pref_bar.append(0)
                 pref_wish.append(0)
                 pref_sous.append(0)
+                pref_aen.append(0)
+                pref_ech.append(0)
                 pref_inc.append(1)
             else:
-                # ekey = (priority_rank, -bareme, wish_rank, sous_rank, tie_str)
+                # ekey = (priority_rank, -bareme, wish_rank, sous_rank,
+                #         -aen_months, -ech_months, tie_str)
                 pref_pri.append(int(ekey[0]))
                 pref_bar.append(-int(ekey[1]))            # store barème as positive
                 pref_wish.append(int(ekey[2]))
                 sval = int(ekey[3])
                 pref_sous.append(sval if sval < BIG else 0)
+                pref_aen.append(-int(ekey[4]))            # store AEN as positive
+                pref_ech.append(-int(ekey[5]))            # store échelon seniority positive
                 pref_inc.append(0)
     off[n_agents] = len(pref_post)
 
@@ -150,6 +159,8 @@ def run_deferred_acceptance_native(
     c_bar = _arr(ctypes.c_int32, pref_bar or [0])
     c_wish = _arr(ctypes.c_int32, pref_wish or [0])
     c_sous = _arr(ctypes.c_int32, pref_sous or [0])
+    c_aen = _arr(ctypes.c_int32, pref_aen or [0])
+    c_ech = _arr(ctypes.c_int32, pref_ech or [0])
     c_inc = _arr(ctypes.c_uint8, pref_inc or [0])
     c_tie = _arr(ctypes.c_uint64, ties or [0])
     c_cap = _arr(ctypes.c_int32, cap or [0])
@@ -159,7 +170,7 @@ def run_deferred_acceptance_native(
 
     rc = lib.affecta_da_solve(
         n_agents, n_posts, c_off, c_post, c_pri, c_bar, c_wish, c_sous,
-        c_inc, c_tie, c_cap, c_capoff, c_out_post, c_out_wish,
+        c_aen, c_ech, c_inc, c_tie, c_cap, c_capoff, c_out_post, c_out_wish,
     )
     if rc < 0:
         raise MemoryError("native core allocation failed")

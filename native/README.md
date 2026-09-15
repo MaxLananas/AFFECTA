@@ -3,8 +3,10 @@
 Noyau C de l'algorithme d'acceptation différée côté enseignants (Gale–Shapley), conçu
 pour passer à l'échelle de **plusieurs millions d'agents** sur un seul cœur. Il produit
 l'**unique appariement stable optimal-enseignant** respectant exactement l'ordre MVT1D
-par poste (priorité ↑, barème ↓, rang de vœu ↑, sous-rang ↑, départage déterministe),
-avec droit absolu du titulaire sur son poste.
+par poste (priorité ↑, barème ↓, rang de vœu ↑, sous-rang ↑, puis la chaîne complète de
+discriminants AEN ↓, ancienneté d'échelon ↓, tirage aléatoire), avec droit absolu du
+titulaire sur son poste. La clé de classement est repliée sans perte dans deux mots de
+64 bits pour minimiser l'empreinte mémoire par créneau (voir `BENCHMARKS.md`).
 
 ## Composants
 
@@ -45,10 +47,10 @@ priorités légales art. 60). Voir `BENCHMARKS.md` pour le tableau complet.
 
 | Agents | Propositions | Build | Solve | Débit | Affectés |
 |---:|---:|---:|---:|---:|---:|
-| 100 000 | 1,26 M | 24 ms | 39 ms | 2,6 M/s | 92,7 % |
-| 1 000 000 | 12,6 M | 198 ms | 579 ms | 1,7 M/s | 92,7 % |
-| 5 000 000 | 63,1 M | 1,04 s | 3,89 s | 1,3 M/s | 92,6 % |
-| 10 000 000 | 126,2 M | 2,30 s | 8,28 s | 1,2 M/s | 92,7 % |
+| 100 000 | 1,26 M | 24 ms | 29 ms | 3,5 M/s | 92,6 % |
+| 1 000 000 | 12,6 M | 245 ms | 555 ms | 1,8 M/s | 92,7 % |
+| 5 000 000 | 63,1 M | 1,12 s | 3,71 s | 1,4 M/s | 92,6 % |
+| 10 000 000 | 86,2 M | 1,79 s | 6,86 s | 1,5 M/s | 90,6 % |
 
 À titre de comparaison, la campagne réelle Guadeloupe (1 310 postes, ~1 200 agents) est
 résolue en **quelques dizaines de millisecondes** ; l'objectif « milliers d'agents en

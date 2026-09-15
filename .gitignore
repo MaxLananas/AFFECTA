@@ -11,3 +11,4 @@ native/*.so
 native/affecta_bench
 native/affecta_verify
 native/*.o
+/AFFECTA

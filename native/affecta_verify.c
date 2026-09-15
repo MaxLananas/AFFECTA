@@ -20,8 +20,9 @@
 
 extern int32_t affecta_da_solve(
     int32_t, int32_t, const int32_t *, const int32_t *, const int32_t *,
-    const int32_t *, const int32_t *, const int32_t *, const uint8_t *,
-    const uint64_t *, const int32_t *, const int32_t *, int32_t *, int32_t *);
+    const int32_t *, const int32_t *, const int32_t *, const int32_t *,
+    const int32_t *, const uint8_t *, const uint64_t *, const int32_t *,
+    const int32_t *, int32_t *, int32_t *);
 
 static inline uint64_t sm64(uint64_t *s) {
     uint64_t z = (*s += 0x9E3779B97F4A7C15ULL);
@@ -31,13 +32,15 @@ static inline uint64_t sm64(uint64_t *s) {
 }
 static inline uint32_t rnd(uint64_t *s, uint32_t n) { return (uint32_t)(sm64(s) % n); }
 
-typedef struct { int32_t pr, ba, wi, so; uint64_t tie; uint8_t inc; } key_t;
+typedef struct { int32_t pr, ba, wi, so, aen, ech; uint64_t tie; uint8_t inc; } key_t;
 static inline int stronger(const key_t *a, const key_t *b) {
     if (a->inc != b->inc) return a->inc > b->inc;
     if (a->pr  != b->pr)  return a->pr  < b->pr;
     if (a->ba  != b->ba)  return a->ba  > b->ba;
     if (a->wi  != b->wi)  return a->wi  < b->wi;
     if (a->so  != b->so)  return a->so  < b->so;
+    if (a->aen != b->aen) return a->aen > b->aen;
+    if (a->ech != b->ech) return a->ech > b->ech;
     return a->tie < b->tie;
 }
 
@@ -66,6 +69,8 @@ int main(int argc, char **argv) {
     int32_t *pbar = malloc((size_t)total_pref*sizeof(int32_t));
     int32_t *pwish= malloc((size_t)total_pref*sizeof(int32_t));
     int32_t *psous= malloc((size_t)total_pref*sizeof(int32_t));
+    int32_t *paen = malloc((size_t)total_pref*sizeof(int32_t));
+    int32_t *pech = malloc((size_t)total_pref*sizeof(int32_t));
     uint8_t *pinc = malloc((size_t)total_pref*sizeof(uint8_t));
     uint64_t*tie  = malloc((size_t)n_agents*sizeof(uint64_t));
     int32_t *opost= malloc((size_t)n_agents*sizeof(int32_t));
@@ -82,19 +87,20 @@ int main(int argc, char **argv) {
         else if (pr < 26) { priority=4; bareme=600; }
         else if (pr < 30) { priority=5; bareme=200; }
         else              { priority=15; bareme=21+(int32_t)rnd(&s,260); }
+        int32_t aen=(int32_t)rnd(&s,480), ech=(int32_t)rnd(&s,60);
         if (rnd(&s, 100) < 62) {
             int32_t home = (int32_t)rnd(&s,(uint32_t)n_posts);
-            pp[w]=home; ppri[w]=priority; pbar[w]=bareme; pwish[w]=0; psous[w]=0; pinc[w]=1; ++w;
+            pp[w]=home; ppri[w]=priority; pbar[w]=bareme; pwish[w]=0; psous[w]=0; paen[w]=aen; pech[w]=ech; pinc[w]=1; ++w;
         }
         for (int32_t k = 0; k < wishes; ++k) {
             pp[w]=(int32_t)rnd(&s,(uint32_t)n_posts); ppri[w]=priority; pbar[w]=bareme;
-            pwish[w]=k+1; psous[w]=(int32_t)rnd(&s,3); pinc[w]=0; ++w;
+            pwish[w]=k+1; psous[w]=(int32_t)rnd(&s,3); paen[w]=aen; pech[w]=ech; pinc[w]=0; ++w;
         }
     }
     off[n_agents] = (int32_t)w;
 
     int32_t assigned = affecta_da_solve(n_agents, n_posts, off, pp, ppri, pbar,
-        pwish, psous, pinc, tie, cap, capoff, opost, owish);
+        pwish, psous, paen, pech, pinc, tie, cap, capoff, opost, owish);
     if (assigned < 0) { fprintf(stderr, "solver alloc failed\n"); return 2; }
 
     /* Build per-post occupant lists from the output. */
@@ -118,7 +124,7 @@ int main(int argc, char **argv) {
         if (opost[i] >= 0) occ[cur[opost[i]]++] = i;
 
     /* helper to fetch an agent's key on a given proposal row */
-    #define KEYROW(row, agent) (key_t){ ppri[row], pbar[row], pwish[row], psous[row], tie[agent], pinc[row] }
+    #define KEYROW(row, agent) (key_t){ ppri[row], pbar[row], pwish[row], psous[row], paen[row], pech[row], tie[agent], pinc[row] }
 
     int64_t envy = 0;
     for (int32_t i = 0; i < n_agents; ++i) {

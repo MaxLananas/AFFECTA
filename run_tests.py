@@ -11,6 +11,7 @@ MODULES = [
     "movement_engine.tests.test_da_engine",
     "movement_engine.tests.test_matching",
     "movement_engine.tests.test_native",
+    "movement_engine.tests.test_realism",
 ]
 
 def main():

@@ -16,6 +16,8 @@ int32_t affecta_da_solve(
     const int32_t *pref_bareme,    /* proposal -> barème (higher better)       */
     const int32_t *pref_wish,      /* proposal -> wish rank (lower better)     */
     const int32_t *pref_sous,      /* proposal -> sub-rank (lower better)      */
+    const int32_t *pref_aen,       /* proposal -> AEN seniority (higher better)*/
+    const int32_t *pref_ech,       /* proposal -> échelon seniority (higher b.)*/
     const uint8_t *pref_incumbent, /* proposal -> 1 if agent's current post    */
     const uint64_t*agent_tie,      /* n_agents -> deterministic tie-break      */
     const int32_t *post_capacity,  /* n_posts                                  */
