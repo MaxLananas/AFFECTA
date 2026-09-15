@@ -99,7 +99,19 @@ AFFECTA_API int32_t affecta_da_solve(
     int32_t       *out_post,      /* n_agents */
     int32_t       *out_wish)      /* n_agents */
 {
+    /* Defensive validation at the ctypes boundary: never dereference a required array that
+     * is NULL, and treat a degenerate population as a trivially solved empty instance
+     * rather than performing out-of-bounds arithmetic. Robustness over assumptions. */
+    if (n_agents < 0 || n_posts < 0) return -1;
+    if (!off || !pref_post || !pref_priority || !pref_bareme || !pref_wish ||
+        !pref_sous || !pref_aen || !pref_ech || !pref_incumbent || !agent_tie ||
+        !post_capacity || !cap_offset || !out_post || !out_wish)
+        return -1;
+    for (int32_t a = 0; a < n_agents; ++a) { out_post[a] = -1; out_wish[a] = -1; }
+    if (n_agents == 0) return 0;
+
     int64_t total_slots = cap_offset[n_posts];
+    if (total_slots < 0) return -1;
 
     int32_t  qcap       = n_agents + 1;                /* ring buffer capacity */
     int32_t *slot_agent = (int32_t *)malloc((size_t)total_slots * sizeof(int32_t));

@@ -131,6 +131,38 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
 
 ---
 
+## Vague 10 — Extension quasi linéaire et durcissement (robustesse) ✅
+- **Phase d'extension : O(agents x postes) -> quasi linéaire.** L'ancienne implémentation
+  rebalayait tous les postes pour chaque agent (20 000 agents = 11,9 s). Réécrite en
+  couplage glouton avec curseur monotone sur les postes non restreints + tas par jeton de
+  titre pour les postes à exigence. **Équivalence stricte prouvée** contre l'implémentation
+  naïve de référence : différentiel exhaustif sur **3 000 instances** aléatoires (capacités
+  multiples, exigences de titre, postes à profil, cas dégénérés) — résultat identique poste
+  pour poste. Gains : 20 k **11 896 ms -> 346 ms (34x)** ; passe désormais à 100 k en 2,6 s.
+- **Bug mémoire latent corrigé (cœur 100 M).** `big_alloc` supposait que `mmap`
+  (`MAP_ANONYMOUS`) fournissait des pages à zéro « sans memset » ; or, sous `-std=c11`,
+  `MAP_ANONYMOUS` n'était PAS défini (masqué par `_POSIX_C_SOURCE`), donc l'allocateur
+  retombait silencieusement sur `malloc` — mémoire NON initialisée. Les cellules de poste
+  contenaient alors des valeurs parasites décodées en identifiants d'agents inexistants
+  (lecture hors bornes). Détecté par AddressSanitizer, invisible en build de production (par
+  chance). Corrigé : `_DEFAULT_SOURCE` (mmap réellement actif), zéro-initialisation
+  EXPLICITE de `g_cell`/`g_anext` (jamais de dépendance à l'allocateur), `munmap`/`free`
+  appariés au bon mode d'allocation, garde `bytes==0`.
+- **Durcissement du cœur de production** (`affecta_core.c`, chargé par ctypes) : validation
+  défensive à la frontière (n < 0, pointeurs requis NULL, `total_slots` négatif ->
+  retour -1 propre ; instance vide -> 0 ; sorties toujours initialisées à -1).
+- **Portes de sûreté reproductibles** ajoutées au Makefile :
+  - `make sanitize` : cœur + démonstrateur sous **ASan + UBSan**, tailles normales ET
+    dégénérées (0, 1, 3, …) — toute lecture hors bornes / UB fait échouer la cible ;
+  - `make tsan` : démonstrateur parallèle sous **ThreadSanitizer** — **0 course de données**
+    confirmée sur le CAS sans verrou (4 fils).
+- Cœur de bibliothèque prouvé **sans fuite** (50 appels répétés sous LeakSanitizer).
+  Déterminisme du cœur 100 M préservé (1/2/4 fils -> appariement identique).
+- Tests : **81 passed / 0 failed** (ajout `tests/test_extension_fast.py`, 5 tests dont le
+  différentiel exhaustif 3 000 instances).
+
+---
+
 ## Reste à faire (pistes priorisées)
 
 - Régénérer `alpha_report.json` avec les métriques de la procédure complète en deux temps

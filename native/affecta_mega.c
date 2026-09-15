@@ -34,6 +34,9 @@
  * latency over the seat array, so it scales with memory bandwidth and core count.
  */
 #define _POSIX_C_SOURCE 200809L
+/* _DEFAULT_SOURCE exposes MAP_ANONYMOUS/madvise under -std=c11; without it glibc hides
+ * them behind _POSIX_C_SOURCE and big_alloc would silently fall back to malloc. */
+#define _DEFAULT_SOURCE 1
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdint.h>
@@ -44,21 +47,41 @@
 #include <time.h>
 #include <unistd.h>
 
-/* Anonymous mmap for the large arrays: zero-filled on first touch (no memset needed) and
- * hinted for transparent huge pages, which reduces TLB pressure on the randomly-accessed
- * seat array where the kernel backs the hint. Falls back to malloc if mmap is unavailable. */
-static void *big_alloc(size_t bytes) {
+/* MAP_ANON is the historical spelling; alias it where only MAP_ANONYMOUS exists. */
+#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
+#  define MAP_ANONYMOUS MAP_ANON
+#endif
+
+/* Large-array allocator. Prefers anonymous mmap (page-granular, hinted for transparent
+ * huge pages to cut TLB misses on the randomly-accessed seat array) and falls back to
+ * calloc if mmap is unavailable or fails.
+ *
+ * CRITICAL: the solver requires these arrays to start ZEROED (an empty seat cell is 0, a
+ * fresh wish cursor is 0). We do NOT rely on the allocator implicitly zeroing memory:
+ * mmap(MAP_ANONYMOUS) is zero-filled by the kernel, but the fallback path must zero
+ * explicitly. Callers that need zeroing pass want_zero=1; those that overwrite every
+ * element themselves (e.g. g_apost, g_frontier) may pass 0 to skip the cost. */
+/* Records whether the large arrays came from mmap (freed with munmap) or calloc (freed
+ * with free). Calling munmap on a malloc'd pointer is undefined behaviour, so we must not
+ * guess. Set to 0 the moment any allocation falls back to calloc. */
+static int g_alloc_via_mmap = 1;
+
+static void *big_alloc(size_t bytes, int want_zero) {
+    if (bytes == 0) bytes = 1;                 /* never call mmap/calloc with 0 */
 #if defined(MAP_ANONYMOUS)
     void *p = mmap(NULL, bytes, PROT_READ | PROT_WRITE,
                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (p == MAP_FAILED) return malloc(bytes);
+    if (p != MAP_FAILED) {
 #if defined(MADV_HUGEPAGE)
-    madvise(p, bytes, MADV_HUGEPAGE);
+        madvise(p, bytes, MADV_HUGEPAGE);
 #endif
-    return p;
-#else
-    return malloc(bytes);
+        return p;                              /* kernel-guaranteed zero pages */
+    }
 #endif
+    /* Fallback: calloc always zeroes, so it is safe whether or not want_zero is set. */
+    (void)want_zero;
+    g_alloc_via_mmap = 0;                       /* freeing must use free(), not munmap() */
+    return calloc(1, bytes);
 }
 
 #define WISHES        16u
@@ -293,16 +316,22 @@ int main(int argc, char **argv) {
     g_n_posts = (int32_t)((int64_t)g_n_agents * 105 / 100 + 16);
 
     double t0 = now_ms();
-    g_cell     = big_alloc((size_t)g_n_posts  * sizeof(_Atomic uint64_t));
-    g_apost    = big_alloc((size_t)g_n_agents * sizeof(_Atomic int32_t));
-    g_anext    = big_alloc((size_t)g_n_agents * sizeof(uint8_t));
-    g_frontier = big_alloc((size_t)g_n_agents * sizeof(int32_t));
-    g_next     = big_alloc((size_t)g_n_agents * sizeof(int32_t));
+    size_t cell_bytes  = (size_t)g_n_posts  * sizeof(_Atomic uint64_t);
+    size_t anext_bytes = (size_t)g_n_agents * sizeof(uint8_t);
+    g_cell     = big_alloc(cell_bytes, 1);                              /* must be zeroed */
+    g_apost    = big_alloc((size_t)g_n_agents * sizeof(_Atomic int32_t), 0);
+    g_anext    = big_alloc(anext_bytes, 1);                            /* must be zeroed */
+    g_frontier = big_alloc((size_t)g_n_agents * sizeof(int32_t), 0);
+    g_next     = big_alloc((size_t)g_n_agents * sizeof(int32_t), 0);
     if (!g_cell || !g_apost || !g_anext || !g_frontier || !g_next) {
         fprintf(stderr, "allocation failed for %d agents\n", g_n_agents);
         return 1;
     }
-    /* mmap(MAP_ANONYMOUS) memory is already zero-filled: g_cell and g_anext need no init. */
+    /* Hard guarantee that the arrays the solver assumes to be zero really are, regardless
+     * of which allocation path big_alloc took. An empty seat cell and a fresh wish cursor
+     * must both read as 0; relying on implicit allocator zeroing is a latent-bug magnet. */
+    memset((void *)g_cell, 0, cell_bytes);
+    memset((void *)g_anext, 0, anext_bytes);
     for (int32_t a = 0; a < g_n_agents; ++a) {
         atomic_store_explicit(&g_apost[a], NO_POST, memory_order_relaxed);
         g_frontier[a] = a;
@@ -351,11 +380,17 @@ int main(int argc, char **argv) {
     else
         printf("stability=not checked (pass 'verify' as arg 4 to enable)\n");
 
-    munmap(g_cell,     (size_t)g_n_posts  * sizeof(uint64_t));
-    munmap(g_apost,    (size_t)g_n_agents * sizeof(int32_t));
-    munmap(g_anext,    (size_t)g_n_agents * sizeof(uint8_t));
-    munmap(g_frontier, (size_t)g_n_agents * sizeof(int32_t));
-    munmap(g_next,     (size_t)g_n_agents * sizeof(int32_t));
+    /* Free by the same method the memory was allocated (munmap on malloc'd memory is UB). */
+    if (g_alloc_via_mmap) {
+        munmap((void *)g_cell,     (size_t)g_n_posts  * sizeof(_Atomic uint64_t));
+        munmap((void *)g_apost,    (size_t)g_n_agents * sizeof(_Atomic int32_t));
+        munmap((void *)g_anext,    (size_t)g_n_agents * sizeof(uint8_t));
+        munmap((void *)g_frontier, (size_t)g_n_agents * sizeof(int32_t));
+        munmap((void *)g_next,     (size_t)g_n_agents * sizeof(int32_t));
+    } else {
+        free((void *)g_cell);  free((void *)g_apost);  free((void *)g_anext);
+        free((void *)g_frontier);  free((void *)g_next);
+    }
     free(tid); free(wk);
     pthread_barrier_destroy(&g_barrier);
     return 0;
