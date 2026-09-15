@@ -19,6 +19,7 @@ from pathlib import Path
 
 from movement_engine.solver.engine import run_engine
 from movement_engine.solver.deferred_acceptance import run_deferred_acceptance
+from movement_engine.solver.pipeline import run_movement
 from movement_engine.optimizer.objective import quality_report
 from movement_engine.optimizer.satisfaction import satisfaction_report
 from movement_engine.explain.stability import check_stability
@@ -58,9 +59,14 @@ def build_report(n_agents: int = 1200, max_wishes: int = 20, seed: int = SEED) -
     posts = load_real_posts()
     agents, wishes = generate_agents_wishes(posts, n_agents, max_wishes, seed=seed)
     # Neither solver mutates posts/agents/wishes, so both can share the same inputs.
+    def _da_pareto(ag, po, wi, campaign_seed):
+        return run_movement(ag, po, wi, campaign_seed=campaign_seed,
+                            pareto_exchanges=True, with_extension=False)
+
     rows = [
         _run_one("LEGACY_GREEDY", run_engine, agents, posts, wishes),
         _run_one("DEFERRED_ACCEPTANCE", run_deferred_acceptance, agents, posts, wishes),
+        _run_one("DA+PARETO_EXCHANGE", _da_pareto, agents, posts, wishes),
     ]
     return {
         "dataset": "guadeloupe-2026 (postes réels, vœux synthétiques)",

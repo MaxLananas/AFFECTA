@@ -42,11 +42,41 @@ from __future__ import annotations
 import hashlib
 from typing import Dict, List, Optional
 
-from movement_engine.domain.models import Agent, Post, Wish
+from movement_engine.domain.models import Agent, Assignment, Post, Wish
 from movement_engine.regulatory.registry import RuleRegistry
 from movement_engine.solver.engine import EngineResult
 from movement_engine.solver.deferred_acceptance import run_deferred_acceptance
 from movement_engine.solver.extension import run_extension, DEFAULT_MOB_THRESHOLD
+
+
+def _rebuild_result(
+    base: EngineResult,
+    assignments: Dict[str, Assignment],
+    extra_metrics: Optional[dict] = None,
+) -> EngineResult:
+    """Recompose un EngineResult cohérent après un post-traitement des affectations.
+
+    Recalcule les métriques d'occupation et le hachage de résultat (le hachage d'entrée
+    et les cycles détectés en phase principale sont conservés).
+    """
+    metrics = dict(base.metrics)
+    metrics["assigned"] = sum(1 for a in assignments.values() if a.kind == "ASSIGNED")
+    metrics["stayed"] = sum(1 for a in assignments.values() if a.kind == "STAY")
+    metrics["unassigned"] = sum(1 for a in assignments.values() if a.kind == "UNASSIGNED")
+    if extra_metrics:
+        metrics.update(extra_metrics)
+    canon = "|".join(
+        f"{a}:{assignments[a].post_id}:{assignments[a].kind}" for a in sorted(assignments)
+    )
+    result_hash = hashlib.sha256(canon.encode()).hexdigest()[:16]
+    return EngineResult(
+        assignments=assignments,
+        cycles=base.cycles,
+        metrics=metrics,
+        elapsed_ms=base.elapsed_ms,
+        input_hash=base.input_hash,
+        result_hash=result_hash,
+    )
 
 
 def count_mob_wishes(wishes: Dict[str, List[Wish]]) -> Dict[str, int]:
@@ -72,6 +102,7 @@ def run_movement(
     *,
     campaign_seed: str = "20260810",
     allow_pure_exchanges: bool = False,
+    pareto_exchanges: bool = False,
     with_extension: bool = True,
     mob_counts: Optional[Dict[str, int]] = None,
     mob_threshold: int = DEFAULT_MOB_THRESHOLD,
@@ -84,12 +115,34 @@ def run_movement(
 
     Le résultat de la phase principale — donc sa stabilité — n'est jamais modifié par
     l'extension : celle-ci ne remplit que des postes restés vacants.
+
+    `pareto_exchanges=True` (PRODUCT_POLICY, désactivé par défaut) applique, APRÈS
+    l'acceptation différée, un post-traitement d'efficacité de Pareto
+    (`optimizer/pareto_exchange.py`) : il exploite les cycles d'échange et les postes
+    libérés en cascade qui rendraient TOUS les enseignants concernés strictement mieux
+    servis, sans jamais créer d'envie justifiée (stabilité re-vérifiée). Le certificat
+    d'échange est joint aux métriques (`metrics["pareto_exchange"]`).
     """
     base = run_deferred_acceptance(
         agents, posts, wishes, registry,
         campaign_seed=campaign_seed,
         allow_pure_exchanges=allow_pure_exchanges,
     )
+
+    if pareto_exchanges:
+        from movement_engine.optimizer.pareto_exchange import improve_pareto
+        improved, pareto_cert = improve_pareto(
+            base.assignments, agents, posts, wishes, registry,
+            campaign_seed=campaign_seed,
+        )
+        if pareto_cert.applied:
+            base = _rebuild_result(base, improved, {
+                "pareto_exchange": pareto_cert.to_dict(),
+                "method": base.metrics.get("method", "DEFERRED_ACCEPTANCE")
+                          + "+PARETO_EXCHANGE",
+            })
+        else:
+            base.metrics["pareto_exchange"] = pareto_cert.to_dict()
 
     if not with_extension:
         return base

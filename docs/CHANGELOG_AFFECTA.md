@@ -163,6 +163,33 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
 
 ---
 
+## Vague 9 — Efficacité de Pareto (Top Trading Cycles & Chains) ✅
+- `optimizer/pareto_exchange.py` : post-traitement d'**efficacité de Pareto** appliqué
+  après l'acceptation différée (PRODUCT_POLICY, `run_movement(..., pareto_exchanges=True)`).
+  Réf. académique : Abdulkadiroğlu & Sönmez (1999), *House Allocation with Existing
+  Tenants* — allocation Pareto-efficace, agents titulaires (« existing tenants »).
+- **Problème mesuré** : l'acceptation différée, conservatrice sur les échanges purs,
+  laissait ~4 (jusqu'à 7) *opportunités d'échange pur* par run — des enseignants qui
+  seraient TOUS strictement mieux servis en échangeant, plus des postes libérés en
+  cascade jamais réofferts.
+- **Solution** : détection des **cycles d'échange** + attribution des **unités vacantes**
+  au meilleur candidat *réglementaire* (chaînes/cascades), en boucle jusqu'à convergence.
+  Garanties, prouvées par tests : amélioration de Pareto STRICTE (aucun lésé), faisabilité
+  (aucun poste dédoublé), **stabilité re-vérifiée** indépendamment (sinon annulation : la
+  garantie d'équité prime sur le bien-être), déterminisme, idempotence.
+- **Certificat d'échange** joint (`metrics["pareto_exchange"]`) : chaque mouvement, poste
+  avant/après et gain de rang par enseignant — traçabilité totale.
+- **Gain mesuré (Guadeloupe 2026, 1 200 agents, postes réels)** :
+  - vœu n°1 : 921 → **925** ; rang moyen 1,351 → **1,337** ; top-3 97,5 % → **97,83 %** ;
+    stabilité **préservée** (0 envie justifiée).
+  - Sur 10 graines : **+2,5 vœu-1 en moyenne**, opportunités d'échange résiduelles
+    4,2 → **1,1** (résidus = cycles non améliorants au sens Pareto, écartés à dessein).
+- `datasets/guadeloupe_2026/da_report.py` : 3ᵉ ligne `DA+PARETO_EXCHANGE` au comparatif.
+- Tests : **88 passed / 0 failed** (+7, `tests/test_pareto_exchange.py` : Pareto strict,
+  faisabilité, stabilité sur 200 instances aléatoires, déterminisme, idempotence, flags).
+
+---
+
 ## Reste à faire (pistes priorisées)
 
 - Régénérer `alpha_report.json` avec les métriques de la procédure complète en deux temps
@@ -173,4 +200,5 @@ Suivi des vagues de la feuille de route (`docs/AUDIT.md`). Chaque entrée est me
   simulations « réalistes » (sans jamais l'imposer comme réglementaire).
 - Politiques de couverture (TEACHER/BALANCED/COVERAGE) : réécrire au-dessus de DA pour
   garder la garantie de stabilité tout en couvrant les postes critiques.
-- Résolution optionnelle des cycles d'échange (TTC — Top Trading Cycles) en PRODUCT_POLICY.
+- ~~Résolution optionnelle des cycles d'échange (TTC — Top Trading Cycles) en
+  PRODUCT_POLICY.~~ → **fait (Vague 9)**.

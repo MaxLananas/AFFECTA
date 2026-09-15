@@ -12,7 +12,7 @@
   "results": [
     {
       "solver": "LEGACY_GREEDY",
-      "elapsed_ms": 97.2,
+      "elapsed_ms": 127.3,
       "assigned": 1093,
       "stayed": 107,
       "unassigned": 0,
@@ -28,7 +28,7 @@
     },
     {
       "solver": "DEFERRED_ACCEPTANCE",
-      "elapsed_ms": 77.0,
+      "elapsed_ms": 98.8,
       "assigned": 1200,
       "stayed": 0,
       "unassigned": 0,
@@ -40,6 +40,22 @@
       "stability_pairs_checked": 403,
       "true_justified_envy": 0,
       "pure_exchange_opportunities": 9,
+      "cycles_detected": 9
+    },
+    {
+      "solver": "DA+PARETO_EXCHANGE",
+      "elapsed_ms": 342.9,
+      "assigned": 1200,
+      "stayed": 0,
+      "unassigned": 0,
+      "first_wish": 925,
+      "first_wish_pct": 77.08,
+      "top3_rate": 97.83,
+      "avg_wish_rank": 1.337,
+      "stable_no_justified_envy": true,
+      "stability_pairs_checked": 386,
+      "true_justified_envy": 0,
+      "pure_exchange_opportunities": 2,
       "cycles_detected": 9
     }
   ]
