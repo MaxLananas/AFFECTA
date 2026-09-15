@@ -1,0 +1,11 @@
+S1|AFFECTA. Le moteur d'affectation des enseignants du premier degré. Rapide, juste, et transparent.
+S2|Chaque année, des milliers d'enseignants demandent une nouvelle affectation, pour des milliers de postes, sous des contraintes strictes.
+S3|Pour l'expliquer clairement, AFFECTA adopte un code couleur unique : l'enseignant, le poste, le vœu satisfait, la candidature écartée, la priorité, et le barème.
+S4|Chaque poste est attribué selon un ordre réglementaire strict : la priorité, le barème, le rang du vœu, le sous-rang, puis les départages.
+S5|Au cœur du moteur : l'acceptation différée de Gale et Shapley. Chaque enseignant propose son meilleur vœu. Chaque poste ne retient que la meilleure candidature. L'évincé se reporte sur le suivant, jusqu'à un appariement stable.
+S6|Cette méthode offre trois garanties mathématiques : aucune envie justifiée, une affectation optimale pour les enseignants, et l'impossibilité de gagner en trichant sur ses vœux.
+S7|Le mouvement se déroule en deux temps. L'acceptation différée produit une affectation stable. Puis l'extension affecte d'office les candidats obligatoires restés sans poste.
+S8|AFFECTA va plus loin. Grâce aux échanges de Pareto, deux enseignants bloqués sur leur second vœu peuvent échanger leurs postes : tous les deux y gagnent, l'équité préservée.
+S9|Sur les données réelles de la Guadeloupe, le verdict est sans appel. L'ancien moteur satisfait treize pour cent des premiers vœux ; AFFECTA, plus de soixante-dix-sept pour cent.
+S10|Et tout cela passe à l'échelle : jusqu'à cent millions d'agents appariés. Quatre-vingt-huit tests réussis, zéro envie justifiée, un cœur natif validé au bit près.
+S11|AFFECTA. Plus juste, plus rapide, entièrement auditable.

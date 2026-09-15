@@ -6,7 +6,7 @@ import struct
 import wave
 
 SR = 48000
-DUR = 108.6
+DUR = 138.0
 N = int(SR * DUR)
 
 # Progression d'accords douce (fréquences en Hz), une par section, ambiance cinématique.
