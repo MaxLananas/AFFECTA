@@ -1,0 +1,9 @@
+# Artefacts dérivés (régénérables) — non versionnés
+frames/
+manifest.txt
+audio/seg/
+audio/voice.wav
+audio/music.wav
+audio/mix.wav
+audio/concat.txt
+__pycache__/
