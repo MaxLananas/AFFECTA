@@ -31,16 +31,16 @@ def load_real_posts() -> Dict[str, Post]:
         pid = str(p["id"])
         vacant = int(p.get("vacants") or 0) > 0
         cap = max(1, int(p.get("capacity") or 1))
+        meta = _post_fields(p)
         # expand multi-capacity posts into unit posts for engine (capacity=1 each)
         # DESIGN_DECISION: unit decomposition for matching simplicity
         if cap == 1:
             posts[pid] = Post(
                 id=pid,
-                commune=p.get("commune") or "",
-                support=p.get("nature_code") or "ECEL",
                 vacant=vacant,
                 capacity=1,
                 holder_id=None if vacant else f"HOLD_{pid}",
+                **meta,
             )
         else:
             for k in range(cap):
@@ -49,13 +49,37 @@ def load_real_posts() -> Dict[str, Post]:
                 unit_vacant = k < int(p.get("vacants") or 0)
                 posts[uid] = Post(
                     id=uid,
-                    commune=p.get("commune") or "",
-                    support=p.get("nature_code") or "ECEL",
                     vacant=unit_vacant,
                     capacity=1,
                     holder_id=None if unit_vacant else f"HOLD_{uid}",
+                    **meta,
                 )
     return posts
+
+
+# Nature codes exigeant un titre (ASH/CAPPEI, direction). REGULATORY_CONFIRMED (structure).
+# Le module de spécialité exact n'étant pas dans les données, on exige la famille "CAPPEI"
+# pour l'ASH et "DIR_LA" (liste d'aptitude) pour la direction. HYPOTHESIS sur le mapping.
+_ASH_NATURES = {"ULEC", "ULCG", "ULLP", "UEE", "UEM", "RASE", "SESD", "ITSP", "ITIN"}
+_DIR_NATURES = {"DE", "DCOM", "DSES", "DCMP"}
+
+
+def _post_fields(p: dict) -> dict:
+    nature = p.get("nature_code") or "ECEL"
+    required: tuple[str, ...] = ()
+    if nature in _ASH_NATURES:
+        required = ("CAPPEI:D",)
+    elif nature in _DIR_NATURES:
+        required = ("DIR_LA",)
+    return {
+        "commune": p.get("commune") or "",
+        "support": nature,
+        "nature_code": nature,
+        "circonscription": p.get("circonscription"),
+        "profil": str(p.get("profil", "")).strip().lower() == "oui",
+        "required_titles": required,
+        "nb_classes": int(p.get("nb_classes") or 0),
+    }
 
 
 def post_meta() -> Dict[str, dict]:

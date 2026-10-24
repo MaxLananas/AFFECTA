@@ -23,7 +23,7 @@ from collections import Counter, defaultdict
 from enum import Enum
 from typing import Dict, List, Tuple
 
-import networkx as nx
+from movement_engine.optimizer import _nxcompat as nx  # pure-Python drop-in (no networkx dependency)
 
 from movement_engine.domain.models import Agent, Assignment, Post, Wish
 from movement_engine.regulatory.scorer import score_candidate
